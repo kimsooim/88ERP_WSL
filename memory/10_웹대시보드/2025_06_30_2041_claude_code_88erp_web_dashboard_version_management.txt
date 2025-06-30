@@ -1,0 +1,86 @@
+# 88ERP 웹 대시보드 버전 관리 및 개발 현황
+날짜: 2025-06-30 20:41
+작업자: Ann (Claude Code 지원)
+
+## 프로젝트 정보
+- 프로젝트명: 88ERP 웹 대시보드
+- 위치: /home/sp1/88ERP/projects/web-dashboard
+- GitHub: https://github.com/kimsooim/88ERP_WSL
+- 현재 버전: v0.1.0 (초기 개발 버전)
+- 브랜치: master
+
+## 서버 실행 정보
+1. 메인 대시보드
+   - URL: http://localhost:3000
+   - PM2 이름: 88erp-dashboard
+   - 프로세스 ID: 0
+
+2. 서버 모니터링 도구
+   - URL: http://localhost:4000
+   - PM2 이름: 88erp-monitor
+   - 프로세스 ID: 1
+   - 별도 프로젝트: /home/sp1/88ERP/projects/server-monitor
+
+## Git 버전 관리 체계
+1. 커밋 규칙
+   - feat: 새로운 기능
+   - fix: 버그 수정
+   - docs: 문서 수정
+   - style: 코드 스타일 변경
+   - refactor: 코드 리팩토링
+   - test: 테스트 추가
+
+2. 브랜치 전략
+   - main/master: 운영 배포용
+   - develop: 개발 통합
+   - feature/: 기능 개발
+   - hotfix/: 긴급 수정
+
+3. 버전 태그
+   - v[major].[minor].[patch]
+   - 현재: v0.1.0 (2025-06-30 생성)
+
+## 오늘 주요 작업 내역
+1. 사용자관리 페이지 오류 수정
+   - /admin/permissions 페이지 구문 오류 해결
+   - 프로필 이미지 기능 추가
+   - 메뉴명 변경: 권한설정 → 사용자관리
+
+2. 서버 모니터링 도구 구축
+   - 별도 포트(4000)에서 실행
+   - PM2 프로세스 관리
+   - 실시간 로그 스트리밍 (WebSocket)
+   - 서버 재시작/중지 기능
+
+3. Git 버전 관리 설정
+   - README.md 문서화 완료
+   - v0.1.0 태그 생성
+   - GitHub 저장소 연결
+
+## 프로젝트 구조
+/home/sp1/88ERP/
+├── projects/
+│   ├── web-dashboard/     # 메인 대시보드
+│   └── server-monitor/    # 서버 모니터링 도구
+├── memory/               # 메모리 저장소
+└── CLAUDE.md            # Claude Code 지침
+
+## 향후 작업 계획
+1. Supabase 데이터베이스 연동
+2. Rocky Linux VM 배포 설정
+3. 도메인 연결 (db.88toy.co.kr)
+4. 로그인/인증 시스템 구현
+5. 실제 데이터 연동 (Notion, eCount, NAS)
+
+## PM2 관리 명령어
+- pm2 status: 프로세스 상태 확인
+- pm2 logs 88erp-dashboard: 로그 확인
+- pm2 restart 88erp-dashboard: 재시작
+- pm2 monit: 모니터링
+
+## 트러블슈팅
+- 빌드 오류 시: rm -rf .next && npm run dev
+- 캐시 문제 시: npm cache clean --force
+
+---
+메모리 저장 완료
