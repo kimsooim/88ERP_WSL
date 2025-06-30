@@ -2,13 +2,13 @@ import pickle
 import os
 import glob
 from datetime import datetime
-from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload
+
+# Windows 경로로 변경
+memory_folder = r'\\wsl.localhost\Ubuntu\home\sp1\88ERP\memory'
+token_path = r'\\wsl.localhost\Ubuntu\home\sp1\88ERP\core\auth\token.pickle'
 
 def find_latest_file():
     """메모리 폴더에서 가장 최근 생성된 파일 찾기"""
-    memory_folder = '/home/sp1/88ERP/memory'
-    
     # txt 파일들만 검색
     pattern = os.path.join(memory_folder, '*.txt')
     files = glob.glob(pattern)
@@ -26,8 +26,17 @@ def find_latest_file():
 def upload_to_gdrive(file_path):
     """Google Drive에 파일 업로드"""
     try:
+        # Google API 라이브러리가 없으면 설치 안내
+        try:
+            from googleapiclient.discovery import build
+            from googleapiclient.http import MediaFileUpload
+        except ImportError:
+            print("Google API 라이브러리가 설치되지 않았습니다.")
+            print("다음 명령어로 설치해주세요:")
+            print("pip install google-api-python-client google-auth google-auth-oauthlib google-auth-httplib2")
+            return False
+            
         # 기존 토큰 로드
-        token_path = '/home/sp1/88ERP/core/auth/token.pickle'
         with open(token_path, 'rb') as token:
             creds = pickle.load(token)
         
@@ -68,6 +77,7 @@ def upload_to_gdrive(file_path):
 
 if __name__ == "__main__":
     print("=== Google Drive 업로드 도구 ===")
+    print(f"메모리 폴더: {memory_folder}")
     
     # 최신 파일 찾기
     latest_file = find_latest_file()
@@ -82,3 +92,5 @@ if __name__ == "__main__":
             print("\n[실패] 업로드 실패!")
     else:
         print("\n업로드할 파일이 없습니다.")
+    
+    input("\nPress Enter to exit...")
