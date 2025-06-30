@@ -1,0 +1,35 @@
+=== 88ERP 웹대시보드 폰트 변경 작업 ===
+날짜: 2025년 6월 30일
+작업자: Ann & Claude Code
+
+[작업 내용]
+1. IBK 기업은행 사이트 폰트 분석
+   - IBKiDreamL, IBKiDreamB 전용 폰트 사용 확인
+   - 모든 요소에 !important로 강제 적용
+   - 폴백 폰트: Arial, Noto Sans KR
+
+2. 88ERP 대시보드 폰트 변경
+   - 기존: 나눔스퀘어 (깨짐 현상 발생)
+   - 변경: Pretendard (깔끔하고 가독성 좋음)
+   - 9가지 굵기 지원 (100~900)
+   - 가변 폰트 지원
+
+3. 변경 파일
+   - /home/sp1/88ERP/projects/web-dashboard/app/fonts.css
+   - /home/sp1/88ERP/projects/web-dashboard/app/globals.css
+
+4. Pretendard 폰트 특징
+   - Apple SF Pro와 유사한 느낌
+   - 한글/영문 조화로운 디자인
+   - 무료 상업적 사용 가능
+   - CDN으로 빠른 로딩
+
+5. 이전 문제 해결
+   - 온라인사업 대시보드 중복 헤더 수정
+   - PM2로 서버 안정성 확보
+   - 로고 클릭시 홈으로 이동 기능 추가
+
+[다음 작업 예정]
+- 손익보고서 페이지 구현
+- 마이페이지 기능 구현
+- Supabase 실제 데이터 연동

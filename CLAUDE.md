@@ -9,11 +9,12 @@
 
 ## "메모리해" 명령시 저장규칙 (2025-06-30 업데이트)
 1. MCP memory 저장 (기억저장소)
-2. WSL 환경 저장: /home/sp1/memory/ (Windows: \\wsl.localhost\Ubuntu\home\sp1\memory)
-3. Git 자동 push: GitHub 저장소에 자동 커밋/push
+2. WSL 환경 저장: /home/sp1/88ERP/memory/
+3. GitHub 저장소에 자동 커밋/push https://github.com/kimsooim/88ERP_WSL
 4. 파일명: 오늘날짜시간_claude_code_제목.txt 
    (예시: 2025_06_27_1659_claude_code_88oem_update.txt)
 5. 하루에 여러번 메모리할경우 메모리해 이후부터 저장 - 내용중복 저장금지 
+6. 구글드라이브는 수동저장
 
 ## "캡쳐봐" 명령시 이미지읽기
 - Read 도구 
@@ -23,35 +24,34 @@
 - 폴더는 수시로 정리하고, 기존의 폴더를 사용함, 사용하지않는 파일들 정리
 - cmd.exe /c 명령어 를 사용하여 드라이브에 접근
 - 시그놀로지 나스 드라이브에 많은데이터 저장되어있음 //ds920
-
-<기본>
-  - WSL:(로컬 시스템) : Linux Ubuntu : \\wsl.localhost\Ubuntu\home\sp1\88ERP <개발메인>
-  - C:(로컬 시스템) Windows C:\88ERP-Fresh <개발보조>
-  - R:(로컬 드라이브) Linux rocky vm SH: root@192.168.32.128 (패스워드: root) <운영메인>
-
-<메모리>
-  - I:(네트워크 드라이브) //ds920/img - 이미지 폴더
-  - Y:(네트워크 드라이브) //ds920/2bot - 교보문고 자동화 
-  - G:(외부 구글드라이브) 메모리백업 파일자동업로드 
+ 
 
 <3층구조>
-  1층: 개발 허브 (C:\88ERP-Fresh)
+  1층: 개발환경
+  - Linux Ubuntu : \\wsl.localhost\Ubuntu\home\sp1\88ERP
+  - C:(로컬 시스템) Windows C:\88ERP-Fresh <개발보조>
   - core/: 메모리, 인증, API 핵심 시스템
   - projects/: 웹대시보드, 교보문고, 데이터수집, 리포팅
   - integrations/: Google Drive, NAS 동기화, 클라우드 백업
   - tools/: 스크립트, 임시작업, 보관함  
 
   2층: 운영 환경 (R: Rocky VM)
-  - services/: 실제 운영되는 서비스들
+  -  - R:(로컬 드라이브) Linux rocky vm SH: root@192.168.32.128 (패스워드: root) <운영메인>
+   - services/: 실제 운영되는 서비스들
   - data/: 원본/처리된 데이터, 리포트, 백업
   - logs/: 시스템/애플리케이션/에러 로그
   - config/: DB, 네트워크, 보안 설정
 
-  3층: NAS (//ds920/2bot)
+  3층: 메모리 NAS (//ds920/2bot), supabase
   - active-projects/: 
   - data-warehouse/: 이미지, 문서, 아카이브 통합
   - monitoring/: 성능, 사용량, 알림 데이터
   - backup/: 일간/주간/월간 백업
+  - I:(네트워크 드라이브) //ds920/img - 이미지 폴더
+  - Y:(네트워크 드라이브) //ds920/2bot - 교보문고 자동화 
+  - G:(외부 구글드라이브) 메모리백업 파일자동업로드
+  - git : https://github.com/kimsooim/88ERP_WSL
+
 
 ## 프로젝트 목표: 88ERP
 - 목표 : 데이터 일원화 + 업무 자동화 + 외부접속 가능한 리눅스 기반 웹대시보드 구현
@@ -78,8 +78,8 @@
 - NAS ↔ Supabase 자동 동기화 (파일 or 데이터 기반 (MCP or rsync)
 
 ## 프로젝트 정보: 88ERP
-- 개발환경 : Linux VMware Workstation Pro
-- 운영환경 : Linux 
+- 개발환경 : Linux wsl
+- 운영환경 : Linux VMware Workstation Pro
 - 웹대시보드 : Windows 기반 브라우저
 - 주요데이터 : supabase 클라우드 (신규)
 - 보조데이터 : 시그놀로지 nas ds920 , ds916 2개사용중
