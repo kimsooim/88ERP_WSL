@@ -2,9 +2,8 @@
 """
 메모리해 명령 통합 스크립트
 1. MCP Memory 저장
-2. 로컬 파일 저장 (C:\88ERP-Fresh\memory\)
+2. WSL 환경에 파일 저장 (/home/sp1/88ERP-Dev/memory/)
 3. Git 저장소 자동 push
-4. Google Drive 업로드 (별도 스크립트)
 """
 
 import os
@@ -13,16 +12,13 @@ import subprocess
 from datetime import datetime
 import json
 
-def save_to_local(content, title="memory"):
-    """로컬 파일 저장"""
+def save_to_wsl(content, title="memory"):
+    """WSL 환경에 파일 저장"""
     timestamp = datetime.now().strftime("%Y_%m_%d_%H%M")
     filename = f"{timestamp}_claude_code_{title}.txt"
     
-    # Windows 경로
-    windows_path = f"C:\\88ERP-Fresh\\memory\\{filename}"
-    
-    # WSL에서 Windows 경로 접근
-    wsl_path = f"/mnt/c/88ERP-Fresh/memory/{filename}"
+    # WSL 경로
+    wsl_path = f"/home/sp1/88ERP-Dev/memory/{filename}"
     
     # 디렉토리 생성
     os.makedirs(os.path.dirname(wsl_path), exist_ok=True)
@@ -31,7 +27,7 @@ def save_to_local(content, title="memory"):
     with open(wsl_path, 'w', encoding='utf-8') as f:
         f.write(content)
     
-    print(f"✅ 로컬 저장 완료: {windows_path}")
+    print(f"✅ WSL 저장 완료: {wsl_path}")
     return filename
 
 def git_auto_push(message="메모리 자동 저장"):
@@ -69,8 +65,8 @@ def memory_with_git(content, title="memory"):
     """메모리해 통합 처리"""
     print("🔄 메모리 저장 시작...")
     
-    # 1. 로컬 파일 저장
-    filename = save_to_local(content, title)
+    # 1. WSL 환경에 파일 저장
+    filename = save_to_wsl(content, title)
     
     # 2. Git push
     git_auto_push(f"메모리 저장: {title}")
@@ -80,8 +76,7 @@ def memory_with_git(content, title="memory"):
         "timestamp": datetime.now().isoformat(),
         "filename": filename,
         "title": title,
-        "git_pushed": True,
-        "google_drive": "pending"
+        "git_pushed": True
     }
     
     log_path = "/home/sp1/88ERP-Dev/memory_log.json"
@@ -97,9 +92,8 @@ def memory_with_git(content, title="memory"):
         json.dump(logs, f, indent=2, ensure_ascii=False)
     
     print("✅ 메모리 저장 완료!")
-    print(f"   - 로컬: {filename}")
+    print(f"   - WSL: /home/sp1/88ERP-Dev/memory/{filename}")
     print(f"   - Git: GitHub 저장소에 push됨")
-    print(f"   - Google Drive: upload_latest_to_gdrive.py 실행 필요")
 
 if __name__ == "__main__":
     # 테스트
