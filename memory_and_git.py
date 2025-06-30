@@ -18,7 +18,7 @@ def save_to_wsl(content, title="memory"):
     filename = f"{timestamp}_claude_code_{title}.txt"
     
     # WSL 경로
-    wsl_path = f"/home/sp1/88ERP-Dev/memory/{filename}"
+    wsl_path = f"/home/sp1/memory/{filename}"
     
     # 디렉토리 생성
     os.makedirs(os.path.dirname(wsl_path), exist_ok=True)
@@ -34,7 +34,7 @@ def git_auto_push(message="메모리 자동 저장"):
     """Git 자동 커밋 및 push"""
     try:
         # Git 저장소로 이동
-        os.chdir("/home/sp1/88ERP-Dev")
+        os.chdir("/home/sp1/88ERP")
         
         # 변경사항 확인
         status = subprocess.run(['git', 'status', '--porcelain'], 
@@ -79,7 +79,7 @@ def memory_with_git(content, title="memory"):
         "git_pushed": True
     }
     
-    log_path = "/home/sp1/88ERP-Dev/memory_log.json"
+    log_path = "/home/sp1/88ERP/memory_log.json"
     logs = []
     
     if os.path.exists(log_path):
@@ -92,7 +92,7 @@ def memory_with_git(content, title="memory"):
         json.dump(logs, f, indent=2, ensure_ascii=False)
     
     print("✅ 메모리 저장 완료!")
-    print(f"   - WSL: /home/sp1/88ERP-Dev/memory/{filename}")
+    print(f"   - WSL: /home/sp1/memory/{filename}")
     print(f"   - Git: GitHub 저장소에 push됨")
 
 if __name__ == "__main__":

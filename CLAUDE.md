@@ -9,7 +9,7 @@
 
 ## "메모리해" 명령시 저장규칙 (2025-06-30 업데이트)
 1. MCP memory 저장 (기억저장소)
-2. WSL 환경 저장: /home/sp1/88ERP-Dev/memory/
+2. WSL 환경 저장: /home/sp1/memory/ (Windows: \\wsl.localhost\Ubuntu\home\sp1\memory)
 3. Git 자동 push: GitHub 저장소에 자동 커밋/push
 4. 파일명: 오늘날짜시간_claude_code_제목.txt 
    (예시: 2025_06_27_1659_claude_code_88oem_update.txt)
@@ -25,8 +25,8 @@
 - 시그놀로지 나스 드라이브에 많은데이터 저장되어있음 //ds920
 
 <기본>
-  - WSL:(로컬 시스템) : Linux Ubuntu : \\wsl.localhost\Ubuntu\home\sp1 <개발보조>
-  - C:(로컬 시스템) Windows C:\88ERP-Fresh <개발메인>
+  - WSL:(로컬 시스템) : Linux Ubuntu : \\wsl.localhost\Ubuntu\home\sp1\88ERP <개발메인>
+  - C:(로컬 시스템) Windows C:\88ERP-Fresh <개발보조>
   - R:(로컬 드라이브) Linux rocky vm SH: root@192.168.32.128 (패스워드: root) <운영메인>
 
 <메모리>
