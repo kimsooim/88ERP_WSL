@@ -1,0 +1,100 @@
+claude_code 저장
+
+# aland_day.py 수정 작업 완료
+
+날짜: 2025-06-25
+사용자: Ann
+작업: aland 작업 스케줄러 문제 해결 및 aland_day.py 파일 수정
+
+## 🎯 발견된 문제들
+
+### 1. 작업 스케줄러 상태
+- **aland_day 자동실행**: 2025-06-26 오전 11:50:00 실행 예정
+- **aland_day_주말**: 2025-06-28 오전 8:10:00 실행 예정
+- 두 작업 모두 "준비" 상태로 정상 대기 중
+- 실행 파일: C:/abot/aland/aland_day.py
+
+### 2. aland_day.py 파일 문제들
+1. **인코딩 오류**: 유니코드 이모지 문자(⏳, ❌, ✅ 등)가 CP949로 인코딩되지 않음
+2. **비즈패션 실행 실패**: .appref-ms 파일 실행 방법 문제
+3. **프로그램 종료 문제**: 스크립트 완료 후 비즈패션이 종료되지 않음
+4. **VS Code 호환성**: 터미널 창 조작 코드로 인한 실행 문제
+
+## ✅ 해결 작업 내용
+
+### 1. 인코딩 오류 수정
+- 모든 이모지 문자를 일반 텍스트로 변경:
+  - ⏳ → [시작]
+  - ❌ → [오류] 
+  - ✅ → [완료]
+  - 📋 → [복사]
+  - 💾 → [저장]
+  - 🚀 → [실행]
+  - 🧹 → [정리]
+
+### 2. 비즈패션 실행 방법 수정
+```python
+# 기존: 작업표시줄 클릭 방식
+pyautogui.click(x=877, y=116, clicks=2, interval=0.25)
+
+# 수정: os.startfile() 사용
+bizfashion_path = r"c:/Users/sp1/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/eBizway 비즈패션/비즈패션 3.0.appref-ms"
+os.startfile(bizfashion_path)
+```
+
+### 3. 자동 종료 기능 추가
+```python
+finally:
+    # Alt+F4로 정상 종료
+    pyautogui.hotkey('alt', 'f4')
+    # 종료 확인 창 자동 처리
+    pyautogui.press('enter')
+    # 프로세스 강제 종료
+    subprocess.run("taskkill /f /im bizfashion.exe", shell=True, capture_output=True)
+```
+
+### 4. VS Code 호환성 개선
+- 터미널 창 조작 코드를 try-except로 감싸서 VS Code 환경에서도 정상 실행
+
+## 🚀 테스트 결과
+
+### 실행 환경별 테스트
+1. **CMD**: 정상 실행 (Python 3.13.3)
+2. **VS Code**: 수정 후 정상 실행
+3. **Cursor**: 정상 실행 확인
+
+### 해결된 문제들
+- ✅ 인코딩 오류 해결
+- ✅ 비즈패션 자동 실행
+- ✅ 프로그램 자동 종료 (종료 확인 창 포함)
+- ✅ VS Code 호환성 확보
+
+## 📋 작업 스케줄러 상태
+
+### 현재 스케줄 (수정 불필요)
+- **aland_day 자동실행**: 내일(26일) 오전 11:50
+- **aland_day_주말**: 28일 오전 8:10
+- 두 작업 모두 수정된 aland_day.py 실행 예정
+
+### 주의사항
+- 스케줄러 경로는 변경하지 않음 (Ann 요청)
+- Python 파일만 수정하여 문제 해결
+
+## 🔧 추가 정보
+
+### 파일 백업
+- **백업 위치**: C:\88ERP-Fresh\tools\aland_day_backup.py
+- **원본 수정**: C:\abot\aland\aland_day.py (5,488 bytes, 2025-06-25 19:14)
+
+### 삭제한 불필요 파일
+- **__pycache__ 폴더**: Python 바이트코드 캐시 (안전하게 삭제)
+
+## 🎯 다음 단계
+
+1. **내일 자동 실행 확인**: 26일 오전 11:50 스케줄 작업 모니터링
+2. **NAS 경로 문제**: \\ds920\2bot\2aland\input\ 접근성 확인 필요
+3. **로그 모니터링**: 에이랜드_로그_log.txt 파일 확인
+
+---
+
+**결과**: aland 자동화 스크립트 완전 복구 및 개선 완료

@@ -1,0 +1,41 @@
+claude_code 저장
+
+# Claude Code에서 클립보드 이미지 보기 방법
+
+날짜: 2025-06-25  
+사용자: Ann  
+기술: 클립보드 캡처 → 파일 저장 → Claude Code 읽기
+
+## 🖼️ 완성된 워크플로우
+
+### 1단계: Windows에서 캡처
+- Win + Shift + S 또는 Print Screen으로 캡처
+- Ctrl + C로 클립보드에 복사
+
+### 2단계: PowerShell로 파일 저장
+powershell.exe -Command "Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; if ([System.Windows.Forms.Clipboard]::ContainsImage()) { [System.Windows.Forms.Clipboard]::GetImage().Save('C:\\temp\\clipboard.png', [System.Drawing.Imaging.ImageFormat]::Png); 'SUCCESS: Image saved' } else { 'FAIL: No image in clipboard' }"
+
+### 3단계: Claude Code에서 이미지 읽기
+Read 도구 사용
+파일 경로: /mnt/c/temp/clipboard.png
+
+## ✅ 핵심 포인트
+- WSL에서 Windows 클립보드 직접 접근 불가
+- PowerShell 스크립트로 클립보드 → 파일 변환
+- Claude Code Read 도구로 이미지 분석 가능
+- 실시간 스크린샷 공유 및 분석 가능
+
+## 🚀 활용 사례
+- 화면 캡처 즉시 분석
+- 에러 메시지 스크린샷 분석
+- UI/디자인 리뷰
+- 문제 해결을 위한 화면 공유
+
+## 🔧 기술적 장점
+- 파일 저장 과정 자동화
+- 클립보드 상태 확인 가능
+- 재사용 가능한 명령어 세트
+- Windows-WSL-Claude Code 완전 통합
+
+---
+중요: 이 방법으로 언제든 캡처 → 분석이 즉시 가능!

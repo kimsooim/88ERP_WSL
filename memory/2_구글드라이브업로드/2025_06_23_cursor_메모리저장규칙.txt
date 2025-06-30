@@ -1,0 +1,12 @@
+[Ann 메모리 저장 규칙]
+
+1. "메모리해" 명령 시 아래와 같이 저장한다.
+2. MCP 메모리(Ann/cursor 내부 메모리)에 저장
+3. Google Drive/88ERP/memory 폴더에도 같은 파일명으로 저장
+4. 두 파일 모두 'cursor 저장'이라고 명시
+5. 파일명: 오늘날짜_cursor_제목.txt (예: 2025_06_23_cursor_88oem_update.txt)
+6. google_workspace용 별도 파일명/내용은 필요 없음
+7. 새 폴더 생성 금지
+
+작성일: 2025-06-21
+작성자: Ann

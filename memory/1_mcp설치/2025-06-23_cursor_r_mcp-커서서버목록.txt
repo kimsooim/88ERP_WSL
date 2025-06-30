@@ -1,0 +1,18 @@
+# MCP 서버 목록 (2025-06-23)
+
+1. filesystem (로컬 파일시스템)
+2. terminal-mcp (터미널 명령)
+3. context7 (컨텍스트7)
+4. googleSearch (구글 검색)
+5. playwright (Playwright 자동화)
+6. memory (메모리 서버)
+7. puppeteer (Puppeteer 자동화)
+8. everything (Everything 파일검색)
+9. notion (Notion 연동)
+10. shrimp-task-manager (Shrimp Task Manager)
+11. google_workspace (Google Workspace 통합)
+
+---
+
+- 최신 설정 파일: C:\Users\sp1\.cursor\mcp.json
+- 각 MCP별 환경변수/설정도 포함됨

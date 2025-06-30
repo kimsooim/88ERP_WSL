@@ -1,0 +1,70 @@
+# 에이랜드 HTML 이메일 템플릿 자동화 완성 보고서
+
+## 프로젝트 개요
+- 완성일: 2025-06-26
+- 담당자: Ann (claude_code 지원)
+- 목표: Gmail과 Outlook에서 완벽하게 작동하는 일일 매출 보고서 HTML 이메일 템플릿 개발
+
+## 주요 해결 이슈들
+
+### 1. 주요성과/개선포인트 2열 레이아웃 문제
+- **문제**: CSS Grid 사용시 Gmail에서 1열로 표시됨
+- **해결**: HTML table 레이아웃으로 변경
+```html
+<table style="width: 100%; border-collapse: separate; border-spacing: 12px 0;">
+    <tr>
+        <td style="width: 50%; vertical-align: top; text-align: left; border-bottom: none;">
+            <div style="background: #f8fafc; padding: 12px; border-radius: 6px;">
+                <h4>주요 성과</h4>
+```
+
+### 2. 총판매수량/총매출액 박스 중앙정렬 문제
+- **문제**: Flexbox 사용시 Gmail에서 좌측 정렬됨
+- **해결**: table 레이아웃으로 변경하고 text-align: center 적용
+
+### 3. NO 컬럼 중앙정렬 문제 (최종 해결)
+- **문제**: CSS 클래스 사용시 Gmail에서 정렬 무시됨
+- **해결**: 인라인 스타일로 모든 td 요소에 직접 적용
+```html
+<td style="width: 35px; text-align: center; padding: 4px 8px;">1</td>
+```
+
+### 4. 테이블 컬럼 너비 고정 문제
+- **문제**: 컬럼 너비가 내용에 따라 변동됨
+- **해결**: 각 컬럼에 고정 픽셀값 적용 (NO: 35px, 제품명: 200px 등)
+
+## 기술적 핵심 포인트
+
+### Gmail 이메일 클라이언트 제약사항
+1. CSS Grid, Flexbox 지원 안됨 → table 레이아웃 사용
+2. CSS 클래스 필터링 → 인라인 스타일 사용 필수
+3. 일부 CSS 속성 무시 → !important 선언 필요
+
+### 해결 방법론
+1. **table 기반 레이아웃**: 모든 복잡한 레이아웃을 table로 구현
+2. **인라인 스타일**: style="" 속성으로 직접 스타일 적용
+3. **자동화 스크립트**: sed 명령어로 대량 인라인 스타일 적용
+
+## 파일 정보
+- **메인 템플릿**: `/mnt/c/abot/aland/test_email_template_v5_2.html`
+- **발송 스크립트**: `/mnt/c/abot/aland/test_email_send.py`
+- **최종 버전**: v12 (NO중앙정렬 인라인스타일)
+
+## 테스트 결과
+- ✅ Gmail: 모든 레이아웃 완벽 표시
+- ✅ Outlook: 모든 레이아웃 완벽 표시
+- ✅ 반응형: 모바일/데스크톱 호환성 확보
+
+## 다음 단계
+1. 실제 데이터 연동 (generate_insights.py)
+2. 자동화 스케줄링 구현
+3. 88ERP 시스템 통합
+
+## 기술 스택
+- HTML Table Layout
+- Inline CSS Styling
+- Python SMTP (Gmail)
+- Base64 Font Embedding (NanumSquare)
+
+## 성과
+Gmail과 Outlook에서 완벽하게 동일한 레이아웃으로 표시되는 HTML 이메일 템플릿 완성. 모든 크로스 브라우저 호환성 이슈 해결.

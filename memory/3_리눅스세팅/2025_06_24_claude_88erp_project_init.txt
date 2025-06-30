@@ -1,0 +1,94 @@
+claude 저장
+
+2025-06-24 Rocky Linux 88ERP 프로젝트 초기화 완성
+=================================================
+
+## 프로젝트 개요
+**프로젝트명**: 88ERP Management System
+**위치**: /share/88erp/www (Rocky Linux 192.168.32.128)
+**기술 스택**: Next.js 14 + TypeScript + Tailwind CSS
+**개발 환경**: SSH MCP + Claude Code
+
+## 성공적인 구축 과정
+
+### 1. 프로젝트 초기화
+- create-next-app이 느려서 수동으로 프로젝트 구성
+- package.json 직접 작성 (Next.js 14, React 18, TypeScript 5)
+- npm install로 385개 패키지 설치 완료 (32초 소요)
+
+### 2. 프로젝트 구조 생성
+```
+/share/88erp/www/
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx     # 루트 레이아웃 (네비게이션 포함)
+│   │   ├── page.tsx       # 메인 홈페이지
+│   │   └── globals.css    # Tailwind CSS 설정
+│   ├── components/        # 공통 컴포넌트
+│   ├── lib/              # 유틸리티 함수
+│   └── types/            # TypeScript 타입 정의
+├── public/               # 정적 파일
+├── next.config.js        # Next.js 설정
+├── tailwind.config.js    # Tailwind 설정
+├── tsconfig.json         # TypeScript 설정
+└── package.json          # 프로젝트 의존성
+```
+
+### 3. 핵심 파일 구성
+**layout.tsx**: 88ERP 브랜딩과 네비게이션이 포함된 루트 레이아웃
+**page.tsx**: 인터랙티브 홈페이지 (대시보드, 재고관리, 주문관리 카드)
+**globals.css**: Tailwind CSS 기본 설정
+**next.config.js**: App Directory 활성화
+
+### 4. 개발 서버 실행
+- npm run dev로 개발 서버 시작
+- 포트 3000에서 정상 실행 중
+- next-server v14.2.30 프로세스 확인
+
+## 기술적 특징
+
+### Frontend 기술
+- **Next.js 14**: 최신 App Directory 구조
+- **TypeScript**: 완전한 타입 안전성
+- **Tailwind CSS**: 반응형 모던 UI
+- **React 18**: 최신 React 기능 활용
+
+### 개발 환경
+- **SSH MCP**: @fangjunjie/ssh-mcp-server로 원격 접속
+- **실시간 개발**: 파일 변경 시 즉시 반영
+- **Claude Code 준비**: AI 페어 프로그래밍 환경
+
+### 보안 및 안정성
+- SSH 화이트리스트로 안전한 명령어만 허용
+- TypeScript로 컴파일 타임 에러 방지
+- ESLint 설정으로 코드 품질 관리
+
+## 현재 상태
+✅ 프로젝트 초기화 완료
+✅ 개발 서버 실행 중 (http://192.168.32.128:3000)
+✅ SSH MCP 원격 개발 환경 구축
+✅ Claude Code 실행 준비 완료
+✅ 기본 UI 컴포넌트 구현
+
+## 다음 개발 단계
+1. **모듈별 페이지 개발**
+   - 대시보드 (/dashboard)
+   - 재고 관리 (/inventory)
+   - 주문 관리 (/orders)
+
+2. **백엔드 연동**
+   - API 라우트 구현
+   - 데이터베이스 연결
+   - 인증 시스템
+
+3. **고급 기능**
+   - 실시간 데이터 업데이트
+   - 리포트 생성
+   - 모바일 최적화
+
+## 성과 요약
+SSH MCP 연결 → Node.js 설치 → Next.js 프로젝트 구축 → 개발 서버 실행까지
+모든 과정이 원활하게 완료되어 완전한 개발 환경이 구축됨!
+
+작성일: 2025-06-24
+작성자: Ann with Claude

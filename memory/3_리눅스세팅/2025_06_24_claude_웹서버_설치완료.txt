@@ -1,0 +1,44 @@
+claude 저장
+
+Rocky Linux 웹서버 설치 완료 기록
+날짜: 2025-06-24
+
+## 웹서버 설치 상세 내역
+
+### Apache HTTP Server
+- 버전: 2.4.62-4.el9.x86_64
+- 상태: active (running)
+- 포트: 80 (HTTP), 443 (HTTPS) 
+- 자동시작: 설정됨
+
+### PHP 설치
+- 버전: 8.0.30-3.el9_6
+- 설치된 모듈:
+  * php-common: 기본 라이브러리
+  * php-cli: 명령줄 인터페이스
+  * php-fpm: FastCGI Process Manager
+  * php-mysqlnd: MySQL 드라이버
+  * php-mbstring: 멀티바이트 문자열 처리
+  * php-opcache: 성능 최적화
+  * php-xml: XML 처리
+  * php-pdo: 데이터베이스 추상화
+
+### 방화벽 설정
+- HTTP 서비스 허용됨
+- HTTPS 서비스 허용됨
+- SSH 서비스 허용됨 (이전 설정)
+- SAMBA 서비스 허용됨 (이전 설정)
+
+### 테스트 파일
+- /var/www/html/info.php 생성 (<?php phpinfo(); ?>)
+- 접근 URL: http://192.168.32.128/info.php
+
+### 서비스 상태
+- httpd.service: active (running)
+- php-fpm.service: active (running)
+- 포트 80에서 정상 대기 중
+
+## 다음 작업
+1. Z:\88ERP → R:\www\ 파일 복사
+2. Apache DocumentRoot를 /share/88erp/www로 변경
+3. 88ERP 웹 환경 테스트

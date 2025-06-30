@@ -1,0 +1,105 @@
+claude_code 저장
+
+# 88ERP-Fresh 폴더 정리 완료 기록
+
+날짜: 2025-06-25
+사용자: Ann
+작업: 혼재된 파일들을 기능별 폴더로 체계적 정리
+
+## 🎯 정리 전후 비교
+
+### Before (정리 전)
+- 총 55개 파일이 루트에 혼재
+- 기능별 구분 없이 무작위 배치
+- 찾기 어렵고 관리 복잡
+
+### After (정리 후)
+- 11개 폴더 + 3개 파일로 체계화
+- 기능별 명확한 분류
+- 깔끔하고 관리 용이
+
+## 📁 새로운 폴더 구조
+
+### 기능별 폴더
+- **memory/**: 메모리 시스템 관련 파일들 (15개)
+  - 메모리 저장 스크립트들
+  - claude_code 관련 파일들
+  - 테스트 메모리 파일들
+
+- **google-drive/**: Google Drive 업로드 스크립트들 (8개)
+  - 업로드 스크립트들
+  - 드라이브 확인/정리 스크립트들
+  - Google workspace 설정 파일
+
+- **kyobo/**: 교보문고 자동화 관련 (14개)
+  - 이메일 알림 스크립트들
+  - Gmail SMTP 연동 파일들
+  - 자동화 배치 파일들
+  - PowerShell 스크립트들
+
+- **auth/**: 인증 정보 파일들 (4개)
+  - token.pickle (Google OAuth)
+  - client_secret.json (Google API)
+  - gcp-oauth.keys.json (GCP OAuth)
+
+- **temp-scripts/**: 임시 스크립트들 (2개)
+  - upload_clipboard_method.js
+  - run_test_via_powershell.ps1
+
+- **archive/**: 보관용 폴더 (비어있음)
+
+### 기존 유지 폴더
+- **app/**: Next.js 웹 애플리케이션
+- **node_modules/**: Node.js 의존성
+- **gdrive-auth-test/**: Google Drive 인증 테스트
+
+### 삭제된 폴더
+- **mcp_servers/**: 사용하지 않는 MCP 개발 소스코드 (완전 삭제)
+- **.credentials/**: auth 폴더로 통합
+
+## ✅ 정리 성과
+
+### 공간 절약
+- 불필요한 mcp_servers 폴더 삭제
+- 중복 인증 파일 정리
+
+### 접근성 향상
+- 기능별 명확한 분류
+- 빠른 파일 찾기 가능
+- 관련 파일들 그룹화
+
+### 유지보수성
+- 새로운 파일 추가 시 명확한 위치
+- 기능별 백업/관리 용이
+- 프로젝트 구조 이해 쉬움
+
+## 🔍 주요 발견사항
+
+### 파일 분석
+- index.html: app/page.tsx에서 빌드된 Next.js 결과물
+- 88ERP 웹 프론트엔드 프로젝트
+- Google Drive 업로드 시스템 완비
+- 교보문고 자동화 시스템 구축
+
+### 중요 파일들
+- auth/token.pickle: Google Drive 업로드 핵심 인증
+- memory/ 폴더: 메모리 시스템의 모든 구성요소
+- kyobo/ 폴더: 교보문고 Gmail 연동 완성
+
+## 🚀 정리 방법론
+
+### 6단계 체계적 정리
+1. 기능별 폴더 생성
+2. 메모리 관련 파일 분류
+3. Google Drive 스크립트 분류
+4. 교보문고 자동화 파일 분류
+5. 인증 파일 통합
+6. 불필요한 파일/폴더 삭제
+
+### 명령어 사용
+- Windows cmd.exe move 명령어 활용
+- 패턴 매칭으로 일괄 이동
+- 안전한 백업 후 삭제
+
+---
+결과: 55개 혼재 파일 → 11개 체계적 폴더구조로 완벽 정리!

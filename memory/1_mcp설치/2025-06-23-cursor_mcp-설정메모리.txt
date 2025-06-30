@@ -1,0 +1,7 @@
+# MCP 설정 메모리
+
+- 현재 MCP 서버: filesystem, terminal-mcp, context7, googleSearch, playwright, memory, puppeteer, everything, notion, shrimp-task-manager, google_workspace
+- 주요 환경: Google Workspace MCP, Notion MCP, Memory MCP, Filesystem MCP
+- OAuth: client_secret.json, GOOGLE_CLIENT_SECRETS, http://localhost:8000/oauth2callback
+- 삭제된 MCP: git-memory (2025-06-23)
+- 문제 해결: 무한 실행 문제, 중복 폴더 정리, 파일명 규칙 도입

@@ -1,0 +1,103 @@
+Claude Code 저장 - Google Drive 메모리 자동화 시스템 완성
+
+날짜: 2025-06-25
+작성자: Ann (코튼푸드/쵸바/코튼애니)
+
+## Google Drive 메모리 자동화 시스템 완성
+
+### 1. 완성된 메모리 시스템 구조
+```
+"메모리해" 명령 실행 시:
+
+1단계: MCP Memory 저장
+   └─ mcp__memory__create_entities
+   └─ 지식 그래프에 영구 저장
+
+2단계: 로컬 파일 저장
+   └─ /home/sp1/tmp/memory/날짜_claude_code_제목.txt
+
+3단계: Windows 백업 저장
+   └─ /mnt/c/88ERP-Fresh/memory/날짜_claude_code_제목.txt
+
+4단계: Google Drive 자동 업로드
+   └─ Python 스크립트 자동 실행
+   └─ 폴더 ID: 19q3wp51S99uPDqAXfG2GpjLvwtnHopfk
+   └─ 성공 시 파일 ID 및 링크 반환
+```
+
+### 2. Google Drive 업로드 성공 기록
+**최근 업로드 성공 파일들:**
+- 2025_06_25_claude_code_google_drive_mcp_success.txt
+  - 파일 ID: 18BjGpd1APe65-Rl1KRQB1_Qo5YB4PKmb
+
+- 2025_06_25_claude_code_Google_Drive_업로드_성공방법.txt
+  - 파일 ID: 1r5QTP1IpSib-Xin0RHaSZ-GmrNBi1L_B
+
+- 2025_06_25_claude_code_88erp_supabase_database_success.txt
+  - 파일 ID: 1fLA_Y51wevQ22n5ulZXnKQ_IpepvauCl
+
+### 3. 기술적 성공 요인
+**인증 시스템:**
+- 기존 OAuth token.pickle 파일 활용
+- 위치: C:\88ERP-Fresh\auth\token.pickle
+- 새로운 인증 과정 불필요
+
+**실행 환경:**
+- Windows Python 환경 사용
+- Google API 라이브러리 완전 지원
+- cmd.exe를 통한 안정적 실행
+
+**API 연동:**
+- Google Drive API v3 직접 호출
+- MediaFileUpload 방식 사용
+- resumable=True 옵션으로 안정성 확보
+
+### 4. 자동화 스크립트 구조
+```python
+# 핵심 업로드 함수
+def upload_to_google_drive():
+    # 1. 토큰 로드
+    with open('C:\\88ERP-Fresh\\auth\\token.pickle', 'rb') as token:
+        creds = pickle.load(token)
+    
+    # 2. Drive 서비스 생성
+    service = build('drive', 'v3', credentials=creds)
+    
+    # 3. 파일 업로드
+    file_metadata = {
+        'name': filename,
+        'parents': ['19q3wp51S99uPDqAXfG2GpjLvwtnHopfk']
+    }
+    
+    # 4. 성공 확인 및 링크 반환
+    return file.get('webViewLink')
+```
+
+### 5. 88ERP 프로젝트 메모리 현황
+**저장된 주요 마일스톤:**
+1. MCP Supabase 설치 완료
+2. Google Drive MCP 연결 성공
+3. 88ERP Supabase 데이터베이스 연결 성공
+4. Google Drive 메모리 자동화 시스템 완성
+
+**데이터 일원화 진행 상황:**
+- Supabase: items 테이블 구축 완료 ✅
+- Google Drive: 자동 백업 시스템 완료 ✅
+- MCP Memory: 지식 그래프 구축 완료 ✅
+- 로컬/Windows 백업: 이중 백업 완료 ✅
+
+### 6. 다음 단계 자동화 계획
+1. 웹 대시보드 개발 (Next.js + Supabase)
+2. 외부 API 자동 수집 (cafe24, kyobo, aland)
+3. Linux 서버 배포 (db.88toy.co.kr)
+4. 업무 자동화 스크립트 구축
+
+### 7. 캐릭터 브랜드 통합 현황
+- 쵸바(Choba): 22종류 → items 테이블 code_char 매핑
+- 코튼푸드(Cottonfood): 28종류 → name_brand 매핑
+- 코튼애니(Cottonani): 라이독, 리우, 에스티베어 → 브랜드 코드 체계
+
+## 🎯 완성된 메모리 워크플로우
+"메모리해" → 4곳 동시 저장 → 성공 확인 → 다음 작업 진행
+
+기록: Claude Code MCP 메모리 시스템 - 완전 자동화 달성!

@@ -1,0 +1,10 @@
+# 파일명 통일 테스트
+
+날짜: 2025-06-27 17:05
+작성자: Claude Code
+내용: upload_to_gdrive.py와 upload_to_gdrive.bat 파일명 통일 테스트
+
+## 변경사항
+- upload_latest_to_gdrive.py → upload_to_gdrive.py로 파일명 변경
+- 배치 파일과 Python 스크립트 파일명 통일
+- 더 간단하고 직관적인 파일명으로 개선

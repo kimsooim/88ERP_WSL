@@ -1,0 +1,149 @@
+claude_code 저장
+
+# WSL Ubuntu 폴더정리 완료 기록
+
+날짜: 2025-06-25
+사용자: Ann
+작업: WSL Ubuntu 환경 폴더 정리 및 최적화
+
+## 🎯 WSL Ubuntu 폴더 용도 정의
+
+### 기본 정보
+- **경로**: //wsl.localhost/Ubuntu/home/sp1
+- **환경**: Windows Subsystem for Linux (Ubuntu)
+- **사용자**: sp1
+- **역할**: 88ERP 프로젝트의 보조적 개발/테스트 환경
+
+### 주요 용도
+1. **Claude Code 개발/테스트 환경**
+   - Linux 환경에서의 Claude Code 실행
+   - MCP 서버 테스트 및 개발
+   - bash, grep, chmod 등 Linux 명령어 사용
+
+2. **MCP 서버 호스팅**
+   - n8n-mcp-server-simple.js 실행
+   - n8n-test MCP 서버 제공
+   - Linux 전용 MCP 기능 지원
+
+3. **Claude Code 설정 관리**
+   - CLAUDE.md (고정 지침 파일)
+   - .claude.json (Claude Code 설정)
+   - MCP 관련 설정 파일들
+
+## 📋 정리 전후 비교
+
+### Before (정리 전)
+- **총 50+ 개 파일**: 혼재된 실험적 파일들
+- **중복 config**: 5개의 claude-desktop-config-*.json
+- **실험 스크립트**: 26개의 테스트/설치 스크립트
+- **임시 파일**: 로그, PID, 배치 파일 등
+- **빈 폴더**: 사용하지 않는 mcp-servers/ 폴더
+
+### After (정리 후)
+- **핵심 파일만 유지**: 필수 기능 파일들만 보존
+- **체계적 구조**: 기능별 명확한 분류
+- **백업 시스템**: essential/ 폴더에 중요 파일 백업
+
+## 🗂️ 정리된 폴더 구조
+
+### 루트 폴더 (/home/sp1/)
+```
+/home/sp1/
+├── CLAUDE.md                    # 고정 지침 파일 ✅
+├── essential/                   # 백업된 필수 파일들
+│   ├── CLAUDE.md
+│   ├── claude_desktop_config.json
+│   └── n8n-mcp-server-simple.js
+└── work/                        # 작업 폴더
+    ├── n8n-mcp-server-simple.js # 현재 사용 중인 MCP 서버 ✅
+    ├── claude_desktop_config.json # MCP 설정 ✅
+    ├── README.md                # 프로젝트 문서 ✅
+    ├── package.json             # Node.js 설정 ✅
+    └── archive-scripts/         # 보관된 실험 스크립트 (22개)
+```
+
+### 시스템 폴더 (자동 생성)
+- `.cache/`, `.config/`, `.local/` - 시스템 설정
+- `.npm/`, `.npm-global/` - Node.js 관련
+- `.ssh/`, `.credentials/` - 인증 관련
+
+## ✅ 정리 작업 내용
+
+### 1단계: 중요 파일 식별
+- **현재 사용 중인 MCP**: n8n-mcp-server-simple.js 확인
+- **고정 지침**: CLAUDE.md 보존
+- **설정 파일**: claude_desktop_config.json 유지
+
+### 2단계: 백업 생성
+- essential/ 폴더 생성
+- 핵심 파일들 안전 백업
+- 복구 가능한 상태 유지
+
+### 3단계: 불필요한 파일 정리
+- **삭제된 파일들**:
+  - 중복 config 파일 5개
+  - 로그/PID 파일들
+  - Windows 배치 파일
+  - 빈 mcp-servers/ 폴더
+
+- **아카이브된 파일들**:
+  - 실험적 스크립트 22개 → archive-scripts/
+  - 실패한 설치 스크립트들
+  - 테스트용 파일들
+
+## 🔧 MCP 서버 상태 확인
+
+### 현재 사용 중인 MCP 서버
+```bash
+claude mcp list | grep n8n
+n8n-test: /usr/bin/node /home/sp1/work/n8n-mcp-server-simple.js
+```
+
+### 정리 후 영향
+- ✅ 현재 사용 중인 n8n MCP 서버 정상 유지
+- ✅ CLAUDE.md 고정 지침 보존
+- ✅ 필수 설정 파일들 안전 유지
+
+## 🚀 WSL vs Windows 역할 구분
+
+### WSL Ubuntu (/home/sp1) - 보조 환경
+- **용도**: 테스트, MCP 서버 호스팅
+- **특징**: Linux 명령어, 권한 관리
+- **현재 크기**: 최소한의 필수 파일만
+
+### Windows (C:\88ERP-Fresh) - 메인 환경
+- **용도**: 주요 개발, Google Drive 연동
+- **특징**: Python 환경, GUI 도구 접근
+- **현재 크기**: 11개 기능별 폴더
+
+## 📊 정리 효과
+
+### 공간 절약
+- 50+ 파일 → 핵심 파일 8개
+- 불필요한 중복 제거
+- 실험 파일들 아카이브
+
+### 접근성 향상
+- 명확한 파일 목적
+- 빠른 필수 파일 접근
+- 백업 시스템 구축
+
+### 유지보수성
+- 간단한 구조
+- 명확한 역할 구분
+- 복구 가능한 백업
+
+## 🎯 향후 활용 방안
+
+### WSL Ubuntu 활용
+- **MCP 서버 개발**: 새로운 MCP 서버 테스트
+- **Linux 도구 사용**: bash 스크립트, 권한 관리
+- **클린 환경**: 실험적 작업을 위한 격리된 환경
+
+### 관리 정책
+- **최소 유지**: 필수 파일만 보관
+- **정기 정리**: 실험 파일들 주기적 정리
+- **백업 활용**: essential/ 폴더 활용한 복구
+
+---
+결과: WSL Ubuntu 환경을 깔끔한 보조 개발환경으로 최적화 완료!

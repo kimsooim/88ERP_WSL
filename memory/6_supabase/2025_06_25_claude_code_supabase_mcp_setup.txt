@@ -1,0 +1,36 @@
+Claude Code 저장 - MCP Supabase 설치 및 설정
+
+날짜: 2025-06-25
+프로젝트: 88ERP - 데이터 일원화 기반 구축
+
+## MCP Supabase 설치 완료 사항
+
+### 1. Supabase CLI 설치
+- 버전: 2.26.9
+- 설치 경로: ~/.local/bin/supabase
+- 상태: 정상 설치 완료
+
+### 2. MCP 패키지 설치
+- mcp-supabase: npm 글로벌 설치 완료
+- supabase-mcp: npm 글로벌 설치 완료  
+- @supabase/supabase-js: 클라이언트 라이브러리 설치 완료
+
+### 3. 설치 과정
+1. Supabase JavaScript 클라이언트 설치
+2. Supabase CLI 수동 설치 (GitHub releases)
+3. MCP 서버 패키지 검색 및 설치
+4. 설치 검증 완료
+
+### 4. 다음 단계 계획
+1. MCP Supabase 서버 설정 파일 생성
+2. 88ERP 데이터베이스 스키마 설계
+3. 기존 데이터 (Notion, ecount, NAS) → Supabase 이전 계획
+4. 외부 접속 가능한 웹 대시보드 구축
+
+### 5. 88ERP 목표
+- 데이터 일원화: Supabase 중심 통합
+- 업무 자동화: MCP 기반 자동화 시스템
+- 웹 대시보드: Linux 서버 + 외부 접속 (db.88toy.co.kr)
+
+설치자: Ann (코튼푸드/쵸바/코튼애니)
+기록: Claude Code MCP 메모리 시스템

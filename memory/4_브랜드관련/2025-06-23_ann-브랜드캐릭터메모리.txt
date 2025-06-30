@@ -1,0 +1,111 @@
+# Ann 브랜드 캐릭터 메모리
+
+- 쵸바(Choba): 22개 캐릭터, 볼체인 토이/키링
+- 코튼푸드(Cottonfood): 28개 캐릭터, 3개 시리즈
+- 코튼애니(Cottonani): 라이독(3색)
+- 제품 카테고리: 볼체인, 키링, 백링, 낮잠쿠션, 워머, 방석, 인형쿠션, 배드민턴, 리빙
+- 정보 기준일: 2025-06-19
+
+쵸바 캐릭터 목록 (22개)
+
+계란 → egg
+
+새우 → shrimp
+
+참치 → tuna
+
+문어 → octopus
+
+연어 → salmon
+
+장어 → eel
+
+날치 → flying_fish_roe
+
+오이 → cucumber
+
+유부 → fried_tofu
+
+꽃게 → crab
+
+상어 → shark
+
+복어 → bowfish
+
+소세지 → sausage
+
+햄 → ham
+
+마카롱 → macaron
+
+붕어빵 → fish_bread
+
+표고 → mushroom
+
+아보카도 → avocado
+
+깻잎 → perilla_leaf
+
+완두콩 → pea
+
+와사비락교 → wasabi_rakkyo
+
+단무지락교 → danmuji_rakkyo
+
+코튼푸드 캐릭터 목록 (28개)
+
+쌀알 → rice
+
+망개떡 → manggaetteok
+
+아보카도 → avocado
+
+복숭아 → peach
+
+식빵 → bread
+
+햄버거 → hamburger
+
+풋고추 → green_pepper
+
+홍고추 → red_pepper
+
+가지 → aubergine
+
+당근 → carrot
+
+바나나 → banana
+
+수박 → watermelon
+
+고추장떡볶이 → gochujang_tteokbokki
+
+짜장떡볶이 → jajang_tteokbokki
+
+그린키위 → greenkiwi
+
+골드키위 → goldkiwi
+
+알밤 → chestnut
+
+스모어쿠키 → smore_cookies
+
+시루떡 → sirutteok
+
+곶감 → persimmon
+
+스트롱베리 → strongberry
+
+오징어 → squid
+
+어묵 → fishcake
+
+고구마 → sweetpotato
+
+초코샘 → chocosam
+
+캔디바 → candybar
+
+참외 → korean_melon
+
+메론빵 → melonbread

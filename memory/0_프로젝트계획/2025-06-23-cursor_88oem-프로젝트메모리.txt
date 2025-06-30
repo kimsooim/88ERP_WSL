@@ -1,0 +1,8 @@
+# 88OEM 프로젝트 메모리
+
+- 프로젝트명: 88OEM
+- 위치: \\ds920\web\88oem
+- 목적: Notion 연동, NAS 연동, 대시보드 구현
+- 주요 기능: Notion DB 연동, NAS 파일 연동, 실시간 대시보드, 사용자 인증 등
+- 현재 상태: MCP 서버 설정 완료, Google Workspace MCP 통합, 메모리 시스템 구축 중
+- 다음 단계: 클로드 Google Workspace MCP 설치, 실시간 동기화 구현, UI 개선

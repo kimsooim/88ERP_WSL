@@ -1,0 +1,90 @@
+claude_code 저장
+
+# Google Drive 업로드 성공 방법론
+
+날짜: 2025-06-25
+사용자: Ann
+기술: 기존 인증토큰 + Windows Python + Google Drive API
+
+## 🎯 성공한 업로드 방법
+
+### 1. 기존 인증 토큰 활용
+- 파일: C:\88ERP-Fresh\auth\token.pickle
+- 기존 OAuth 인증 정보 재사용
+- 새로운 인증 과정 불필요
+
+### 2. Windows Python 환경 사용
+- WSL Python: Google API 라이브러리 없음 ❌
+- Windows Python: Google API 라이브러리 설치됨 ✅
+- 명령어: cmd.exe /c "cd C:\\88ERP-Fresh && python script.py"
+
+### 3. 검증된 업로드 스크립트
+```python
+import pickle
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
+
+# 토큰 로드
+with open('token.pickle', 'rb') as token:
+    creds = pickle.load(token)
+
+service = build('drive', 'v3', credentials=creds)
+
+# 정확한 폴더 ID 지정
+correct_memory_id = '19q3wp51S99uPDqAXfG2GpjLvwtnHopfk'
+
+# 파일 업로드
+file_metadata = {
+    'name': 'filename.txt',
+    'parents': [correct_memory_id]
+}
+media = MediaFileUpload(file_path, resumable=True)
+file = service.files().create(body=file_metadata, media_body=media, fields='id,name,webViewLink').execute()
+```
+
+### 4. 올바른 폴더 지정
+- 메모리 폴더 ID: 19q3wp51S99uPDqAXfG2GpjLvwtnHopfk
+- 링크: https://drive.google.com/drive/u/1/folders/19q3wp51S99uPDqAXfG2GpjLvwtnHopfk
+
+## ✅ 성공 요인 분석
+
+### 환경 설정
+- Windows Python 환경 (Google API 지원)
+- 기존 OAuth 토큰 파일 존재
+- 올바른 작업 디렉토리 설정
+
+### 기술적 장점
+- MCP google_workspace 의존성 없음
+- 새로운 인증 불필요
+- 안정적인 API 호출
+- 정확한 폴더 타겟팅
+
+### 실패했던 방법들
+- Gmail SMTP 방식 ❌
+- WSL Python 환경 ❌
+- MCP google_workspace (의존성 부족) ❌
+- curl API 호출 (토큰 없음) ❌
+
+## 🚀 재현 가능한 워크플로우
+
+### 단계별 실행
+1. 파일을 /tmp/memory/ 저장
+2. 파일을 C:\88ERP-Fresh/ 복사
+3. Windows에서 Python 스크립트 실행
+4. Google Drive API로 업로드
+5. 성공 확인
+
+### 필수 조건
+- token.pickle 파일 존재
+- Windows Python + Google API 라이브러리
+- 올바른 폴더 ID 사용
+- 파일 경로 정확성
+
+## 📊 성공 기록
+- 클립보드 캡처 방법 (MD): 업로드 성공
+- 클립보드 캡처 방법 (TXT): 업로드 성공
+- 파일 ID들: 1cxNVaXMw7P2Il72O8DPkjG0-axePqHEa, 1Pcx0QOM6l8QnWtWnBvfCrDBL4hlR93ed
+
+---
+핵심: 기존 인증토큰 + Windows Python 환경이 성공의 열쇠!

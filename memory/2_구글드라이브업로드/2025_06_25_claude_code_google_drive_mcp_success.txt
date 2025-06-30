@@ -1,0 +1,44 @@
+Claude Code 저장 - Google Drive MCP 연결 성공
+
+날짜: 2025-06-25
+작성자: Ann (코튼푸드/쵸바/코튼애니)
+
+## Google Drive MCP 연결 성공 내역
+
+### 1. OAuth 설정 완료
+- 위치: /mnt/c/88ERP-Fresh/auth/client_secret.json
+- 복사: /mnt/c/88ERP-Fresh/client_secret.json
+- 상태: MCP Google Workspace 인증 준비 완료
+
+### 2. 인증 링크 생성 성공
+- Client ID: 481093250429-v9n4vp6qtf1kt9efo6qa8ss54doqbn7l.apps.googleusercontent.com
+- 권한: Google Drive, Gmail, Calendar, Docs, Sheets, Forms, Chat
+- 리다이렉트: http://localhost:8000/oauth2callback
+
+### 3. 메모리 자동화 시스템 구축
+- 로컬 저장: /home/sp1/tmp/memory/
+- Windows 백업: /mnt/c/88ERP-Fresh/memory/
+- Google Drive: 폴더 ID 19q3wp51S99uPDqAXfG2GpjLvwtnHopfk
+- MCP Memory: 지식 그래프 저장
+
+### 4. 88ERP 프로젝트 진행 상황
+- MCP Supabase: 설치 완료
+- MCP Google Workspace: 인증 설정 완료
+- 데이터 일원화: 기반 구축 완료
+- 다음 단계: Supabase 스키마 설계
+
+### 5. 사용법
+```bash
+# 메모리 명령어
+"메모리해" → 자동으로 3곳에 저장
+1. MCP Memory (지식 그래프)
+2. 로컬 파일 시스템
+3. Google Drive (인증 후)
+```
+
+### 6. 캐릭터 브랜드 정보
+- 쵸바(Choba): 22종류 스시 캐릭터
+- 코튼푸드(Cottonfood): 28종류 음식 캐릭터  
+- 코튼애니(Cottonani): 라이독, 리우, 에스티베어
+
+기록: Claude Code MCP 메모리 시스템

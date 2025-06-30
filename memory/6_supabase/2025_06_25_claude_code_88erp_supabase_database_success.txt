@@ -1,0 +1,98 @@
+Claude Code 저장 - 88ERP Supabase 데이터베이스 연결 성공
+
+날짜: 2025-06-25
+작성자: Ann (코튼푸드/쵸바/코튼애니)
+
+## 88ERP Supabase 데이터베이스 연결 성공
+
+### 1. 프로젝트 정보
+- Supabase 프로젝트 ID: aagknclousyujvgfxbgr
+- URL: https://aagknclousyujvgfxbgr.supabase.co
+- MCP 서버: http://localhost:3000 정상 연결
+
+### 2. 발견된 데이터베이스 구조
+**items 테이블 - 완전한 상품 관리 시스템**
+
+#### 기본 정보
+- id: 제품 고유 ID (UUID)
+- name_kr: 품목명(한글)
+- name_en: 품목명(영문)
+- type_stage: 품목구분
+- is_stocked: 재고관리 여부
+
+#### 코드 체계 (통합 관리)
+- code_ecount: 이카운트 코드
+- code_nemone: 네모네 코드
+- code_aland: 에이랜드 코드
+- code_brand: 브랜드코드
+- code_char: 캐릭터코드
+- code_kind: 품목종류코드
+
+#### 브랜드/캐릭터 관리
+- name_brand: 브랜드명 (코튼푸드/쵸바/코튼애니)
+- name_char: 캐릭터명
+- name_kind: 품목종류명
+
+#### 가격 체계 (다단계)
+- price_cons: 판매_소비자
+- price_on: 판매_온라인
+- price_off: 판매_오프라인가
+- price_b2b_1: 판매_도도매
+- price_b2b_2: 판매_대량판매
+- price_oem_smp: 판매_OEM샘플
+- price_oem_prod: 판매_OEM생산
+- price_oem_dp: 판매_OEM계약
+
+#### 원가 관리 (글로벌)
+- cost_usd: 원가_수입가(달러)
+- cost_cny: 원가_수입가(위안)
+- cost_cons: 원가_소비자
+- cost_on: 원가_온라인
+- cost_off: 원가_오프라인가
+- cost_b2b_1: 원가_도도매
+- cost_b2b_2: 원가_대량판매
+- cost_oem_smp: 원가_OEM샘플
+- cost_oem_prod: 원가_OEM생산
+- cost_oem_dp: 원가_OEM계약
+
+#### 포장/물류 정보
+- size: 제품사이즈
+- opp_name: OPP명
+- opp_pcs: OPP입수
+- opp_size: OPP사이즈
+- box_name: 박스명
+- box_pcs: 박스입수
+- box_size: 박스사이즈
+- logis_hj: 택배타입_한진
+- logis_lt: 택배타입_롯데
+
+#### 인증/관리 정보
+- kc_code: KC인증번호
+- kc_day_start: KC인증시작일
+- kc_day_end: KC인증만료일
+- day_cdt: 등록일
+- day_udt: 수정일
+- keywords: 키워드
+- note: 비고사항
+
+### 3. 88ERP 프로젝트 목표 달성 현황
+✅ 데이터 일원화: Supabase 중심 통합 완료
+✅ 기존 시스템 연동: ecount, nemone, aland 코드 통합
+✅ 브랜드 관리: 쵸바, 코튼푸드, 코튼애니 지원
+✅ 가격 체계: 소비자~OEM까지 다단계 관리
+✅ 글로벌 원가: USD, CNY 수입가 관리
+✅ 물류 시스템: 포장, 택배, 사이즈 통합 관리
+✅ 인증 관리: KC인증 기간 관리
+
+### 4. 다음 단계 계획
+1. 웹 대시보드 연결 (Next.js + Supabase)
+2. 외부 API 연동 (cafe24, kyobo, aland)
+3. 자동화 시스템 구축 (MCP 기반)
+4. 리눅스 서버 배포 (db.88toy.co.kr)
+
+### 5. 캐릭터 브랜드 매핑
+- 쵸바(Choba): 22종류 스시 캐릭터
+- 코튼푸드(Cottonfood): 28종류 음식 캐릭터
+- 코튼애니(Cottonani): 라이독, 리우, 에스티베어
+
+기록: Claude Code MCP 메모리 시스템

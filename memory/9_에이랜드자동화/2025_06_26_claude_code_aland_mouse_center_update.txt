@@ -1,0 +1,63 @@
+# 2025년 6월 26일 Claude Code 추가 작업 기록
+
+## 작업 내용: aland_day.py 마우스 포인터 가운데 모니터 이동 기능 추가
+
+### 문제 상황
+- 사용자가 C:\abot\aland\aland_day.py 실행 시 마우스 포인터가 가운데 모니터로 오도록 요청
+- 멀티 모니터 환경에서 정확한 위치 지정 필요
+
+### 해결 방법
+
+#### 1. screeninfo 라이브러리 설치
+```bash
+pip install screeninfo
+```
+
+#### 2. 모니터 구성 확인
+- 총 3개 모니터 감지
+- 모니터 0: 1920x1080 at (1920, 0) - 오른쪽 모니터
+- 모니터 1: 1920x1080 at (0, 0) - **가운데 모니터** (메인)
+- 모니터 2: 1920x1080 at (-1920, 10) - 왼쪽 모니터
+
+#### 3. 추가된 기능 코드
+```python
+def move_mouse_to_center():
+    try:
+        from screeninfo import get_monitors
+        monitors = get_monitors()
+        
+        # 가운데 모니터 찾기 (0,0 위치)
+        for i, monitor in enumerate(monitors):
+            if monitor.x == 0 and monitor.y == 0:
+                center_monitor = monitor
+                break
+        
+        # 마우스를 가운데 모니터 중앙으로 이동
+        center_x = center_monitor.x + center_monitor.width // 2
+        center_y = center_monitor.y + center_monitor.height // 2
+        pyautogui.moveTo(center_x, center_y, duration=0.5)
+```
+
+#### 4. 주요 특징
+- **자동 감지**: (0,0) 위치의 모니터를 가운데 모니터로 자동 인식
+- **다중 백업**: screeninfo 없을 때 pyautogui 기본 방식 사용
+- **에러 처리**: 실패 시 화면 중앙으로 이동
+- **프로그램 시작 시 자동 실행**: 스크립트 시작 즉시 마우스 이동
+
+#### 5. 파일 위치
+- 메인 스크립트: `C:\abot\aland\aland_day.py`
+- 테스트 스크립트: `C:\abot\aland\test_mouse_center.py`
+- 모니터 정보 확인: `C:\abot\aland\test_screeninfo.py`
+
+### 테스트 방법
+```cmd
+cd C:\abot\aland
+python test_mouse_center.py
+```
+
+### 결과
+- 프로그램 실행 시 마우스가 자동으로 가운데 모니터(1920x1080) 중앙 위치(960, 540)로 이동
+- 멀티 모니터 환경에서 정확한 위치 지정 성공
+- 에이랜드 자동화 스크립트의 안정성 향상
+
+claude_code 저장

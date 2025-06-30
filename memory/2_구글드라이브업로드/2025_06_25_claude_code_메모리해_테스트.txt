@@ -1,0 +1,21 @@
+claude_code 저장
+
+# 메모리해 기능 테스트
+날짜: 2025-06-25
+작성자: Claude Code
+
+## 테스트 내용
+- "메모리해" 명령어로 자동 저장 기능 실행
+- MCP memory 저장 테스트
+- 백업 폴더 저장 테스트
+- Google Drive 연동 준비 완료
+
+## 저장 위치
+1. MCP memory 서버
+2. /tmp/memory/ 폴더
+3. C:\88ERP-Fresh 폴더 (Google Drive 업로드용)
+
+## 기능 상태
+✅ 파일명 자동 생성: 2025_06_25_claude_code_메모리해_테스트.txt
+✅ 'claude_code 저장' 명시
+✅ 다중 위치 저장 완료

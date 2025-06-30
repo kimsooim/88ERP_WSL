@@ -1,0 +1,40 @@
+claude 저장
+
+2025-06-24 SSH MCP 서버 연결 대성공 기록
+=============================================
+
+## 문제 상황
+- 메모리에서 확인된 SSH MCP 실패 이력: @fangjunjie/ssh-mcp-server, mcp-ssh, @weidwonder/terminal-mcp-server 등 모두 불안정
+- SSH 연결 실패로 Claude Code 환경 구축 어려움
+- Rocky Linux 서버는 설치되어 있지만 원격 개발 환경 부재
+
+## 해결 과정
+1. **포기하지 않고 재탐색**: 웹검색으로 새로운 SSH MCP 서버 발견
+2. **최신 버전 발견**: classfang/ssh-mcp-server (@fangjunjie/ssh-mcp-server) 2025년 5월 업데이트
+3. **직접 테스트**: NPX로 바로 실행
+   ```
+   npx -y @fangjunjie/ssh-mcp-server --host 192.168.32.128 --port 22 --username root --password root
+   ```
+4. **Claude Desktop 설정**: ssh-rocky-linux 서버 추가
+   - 보안 화이트리스트 설정: ^ls.*,^cat.*,^pwd.*,^cd.*,^mkdir.*,^touch.*,^echo.*,^find.*,^grep.*,^df.*,^free.*,^ps.*,^top.*,^htop.*,^systemctl.*,^npm.*,^node.*,^python.*,^git.*
+
+## 성공 결과
+✅ SSH MCP 서버 정상 연결 (재시작 후 pwd 명령어로 /root 확인)
+✅ Rocky Linux에 Node.js v22.16.0, npm 10.9.2 설치 완료
+✅ /share/88erp/www에서 npm init -y로 프로젝트 초기화
+✅ index.js 테스트 파일 생성 및 실행 성공: "88ERP 프로젝트 시작!"
+✅ Claude Code 실행 환경 완전 구축
+✅ SSH MCP를 통한 원격 개발 환경 완성
+
+## 교훈
+- 포기하지 말고 계속 찾으면 답이 있다
+- 최신 버전과 커뮤니티 업데이트를 놓치지 말 것
+- 메모리 기록을 참고하되, 새로운 해결책도 적극 탐색
+
+## 다음 단계
+1. 88ERP Next.js 프로젝트를 Rocky Linux로 이전
+2. Claude Code로 개발 시작
+3. SSH MCP 자동화 워크플로우 구축
+
+작성일: 2025-06-24
+작성자: Ann with Claude

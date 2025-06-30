@@ -1,0 +1,60 @@
+===== 88ERP 프로젝트 폴더 재구성 완료 =====
+날짜: 2025-06-30
+시간: 13:45
+
+## 주요 변경사항
+
+### 1. 메인 개발 환경 이전
+- 기존: Windows C:\88ERP-Fresh (개발보조)
+- 변경: Linux /home/sp1/88ERP (개발메인)
+- WSL Ubuntu 환경을 메인 개발 환경으로 전환
+
+### 2. 3층 구조 디렉토리 생성 완료
+/home/sp1/88ERP/
+├── core/           # 메모리, 인증, API 핵심 시스템
+├── projects/       # 웹대시보드, 교보문고, 데이터수집, 리포팅
+├── integrations/   # Google Drive, NAS 동기화, 클라우드 백업
+└── tools/          # 스크립트, 임시작업, 보관함
+
+### 3. 중요 파일 및 폴더 이동 완료
+- auth 폴더 → core/auth/
+  - Google API 인증 파일 (credentials.json, token.pickle)
+  - 서비스 계정 키 파일들
+  
+- kyobo 폴더 → projects/kyobo/
+  - 교보문고 자동화 스크립트
+  - 관련 설정 파일들
+  
+- web-dashboard → projects/web-dashboard/
+  - Next.js 웹 대시보드
+  - Supabase 연동 코드
+
+### 4. upload_to_gdrive.py 경로 수정
+- 메모리 폴더 경로: /home/sp1/88ERP/memory
+- 토큰 경로: /home/sp1/88ERP/core/auth/token.pickle
+- 스크립트 자동 실행 설정 완료
+
+### 5. memory 폴더 구조 확인
+/home/sp1/88ERP/memory/
+├── 0_88erp/
+├── 1_notion/
+├── 2_mcp/
+├── 3_automation/
+├── 4_dashboard/
+├── 5_api/
+├── 6_data/
+├── 7_reports/
+├── 8_backup/
+└── 9_misc/
+
+### 6. Git 설정 완료
+- 저장소: /home/sp1/88ERP
+- .gitignore 설정 (인증 파일, 토큰 제외)
+- 자동 push 기능 활성화
+
+## 다음 단계 권장사항
+1. Windows C:\88ERP-Fresh 폴더 백업 후 정리
+2. Rocky Linux VM과의 동기화 설정
+3. NAS 연동 경로 업데이트
+
+===== 메모리 저장 완료 =====
