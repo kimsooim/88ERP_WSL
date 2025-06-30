@@ -8,8 +8,9 @@
 - 진행프로젝트 : 88ERP (AI로 자체 ERP 구축중)
 
 ## "메모리해" 명령시 저장규칙 (2025-06-30 업데이트)
+### ⚠️ 중요: 메모리 저장 경로는 /home/sp1/88ERP/memory/ 입니다 (프로젝트 폴더 내부)
 1. MCP memory 저장 (기억저장소)
-2. WSL 환경 저장: /home/sp1/88ERP/memory/
+2. WSL 환경 저장: /home/sp1/88ERP/memory/ (NOT /home/sp1/memory/)
 3. GitHub 저장소에 자동 커밋/push https://github.com/kimsooim/88ERP_WSL
 4. 파일명: 오늘날짜시간_claude_code_제목.txt 
    (예시: 2025_06_27_1659_claude_code_88oem_update.txt)
