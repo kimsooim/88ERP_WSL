@@ -1,0 +1,160 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --primary-color: #3B82F6;
+    --secondary-color: #10B981;
+    --danger-color: #EF4444;
+    --warning-color: #F59E0B;
+  }
+}
+
+@layer components {
+  /* 토스 스타일 애니메이션 */
+  .animate-fadeIn {
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* 토스 스타일 버튼 */
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg transition-all duration-200 font-medium text-sm focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+  
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+  
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500;
+  }
+  
+  .btn-error {
+    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+  }
+  
+  .btn-success {
+    @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
+  }
+  
+  .btn-ghost {
+    @apply bg-transparent text-gray-600 hover:bg-gray-100 focus:ring-gray-500;
+  }
+
+  /* 토스 스타일 카드 - 이메일 템플릿과 동일 */
+  .card {
+    @apply bg-white rounded-lg border border-gray-200 p-5;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  .card-header {
+    @apply mb-4 pb-3 border-b border-gray-100;
+  }
+
+  .card-title {
+    @apply text-base font-semibold text-gray-900 m-0;
+  }
+
+  /* 토스 스타일 요약 카드 */
+  .summary-card {
+    @apply bg-slate-50 rounded-lg p-4 text-center;
+  }
+
+  .summary-card-title {
+    @apply text-xs font-medium text-slate-600 mb-2 uppercase tracking-wide;
+  }
+
+  .summary-card-value {
+    @apply text-xl font-bold text-slate-900;
+  }
+
+  /* 토스 스타일 테이블 */
+  .table-container {
+    @apply bg-white rounded-lg border border-gray-200 overflow-hidden;
+  }
+
+  .table {
+    @apply w-full border-collapse text-sm;
+  }
+
+  .table th {
+    @apply bg-slate-50 px-4 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide border-b border-gray-200;
+  }
+
+  .table td {
+    @apply px-4 py-3 border-b border-gray-100 text-slate-700;
+  }
+
+  .table tbody tr:hover {
+    @apply bg-slate-50;
+  }
+
+  /* 토스 스타일 인사이트 박스 */
+  .insight-box {
+    @apply bg-slate-50 rounded-lg p-4;
+  }
+
+  .insight-box-title {
+    @apply text-sm font-semibold text-slate-900 mb-3;
+  }
+
+  .insight-list {
+    @apply text-xs text-slate-600 space-y-1;
+  }
+
+  /* 텍스트 스타일 */
+  .text-primary {
+    @apply text-blue-600;
+  }
+
+  .text-success {
+    @apply text-green-600;
+  }
+
+  .text-warning {
+    @apply text-orange-600;
+  }
+
+  .text-danger {
+    @apply text-red-600;
+  }
+
+  /* 상태 배지 */
+  .badge {
+    @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply bg-green-100 text-green-800;
+  }
+
+  .badge-warning {
+    @apply bg-orange-100 text-orange-800;
+  }
+
+  .badge-danger {
+    @apply bg-red-100 text-red-800;
+  }
+
+  .badge-info {
+    @apply bg-blue-100 text-blue-800;
+  }
+}
