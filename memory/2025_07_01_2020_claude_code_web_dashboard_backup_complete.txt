@@ -1,0 +1,39 @@
+제목: 웹대시보드 실제 백업 완료 - Git 서브모듈 문제 해결
+
+날짜: 2025년 7월 1일
+
+1. 웹대시보드 다운 및 복구
+   - WSL에서 pm2 재시작 중 다운
+   - pm2 프로세스 완전 삭제 후 재시작으로 해결
+   - Rocky VM은 아직 배포 전 상태
+
+2. Git 백업 문제 발견
+   - 6월 30일 v1.1.0: 태그만 있고 실제 파일 없음 (서브모듈 문제)
+   - 7월 1일: 서브모듈 제거하고 실제 백업 완료
+   - 2384개 파일, 66개 TypeScript/TSX 파일 백업
+   - v1.2.0 태그로 실제 백업 표시
+
+3. 교훈
+   - 백업 후 실제 파일 확인 필수
+   - Git 서브모듈 주의
+   - 중요 작업 전 백업 폴더 생성
+
+4. 백업 완료 경로
+   - GitHub: https://github.com/kimsooim/88ERP_WSL
+   - 로컬 메모리: /home/sp1/88ERP/memory/10_웹대시보드/
+   - 백업 폴더: /home/sp1/88ERP/web-dashboard-backup-20250701_201047/
+
+5. 주요 기술 스택
+   - Next.js 14 (App Router)
+   - TypeScript
+   - Tailwind CSS
+   - Supabase (데이터베이스)
+   - PM2 (프로세스 관리)
+
+6. 백업 통계
+   - 총 파일 수: 2384개
+   - TypeScript 파일: 24개
+   - TSX 파일: 42개
+   - 백업 크기: 약 30MB (node_modules 제외)
+
+작성자: Claude Code (Ann의 요청으로 기록)
