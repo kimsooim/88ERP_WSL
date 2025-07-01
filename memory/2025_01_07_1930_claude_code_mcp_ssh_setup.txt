@@ -1,0 +1,75 @@
+# Claude Code MCP SSH 서버 설정
+날짜: 2025-01-07 19:30
+작성자: Claude Code
+
+## 작업 내용
+
+### MCP SSH 서버 추가
+- **목적**: Claude Desktop과 동일한 Rocky Linux VM SSH 접근 설정
+- **서버명**: ssh-rocky-linux
+- **설정 파일**: /home/sp1/.config/claude/claude_code_config.json
+
+### 설정 정보
+```json
+"ssh-rocky-linux": {
+  "command": "npx",
+  "args": [
+    "-y",
+    "@fangjunjie/ssh-mcp-server",
+    "--host", "192.168.32.128",
+    "--port", "22",
+    "--username", "root",
+    "--password", "root",
+    "--whitelist", "ls,cat,pwd,cd,mkdir,touch,echo,find,grep,df,free,ps,top,htop,systemctl,npm,node,python,git,vim,nano,cp,mv,rm,chmod,chown,tar,unzip,wget,curl"
+  ]
+}
+```
+
+### Rocky Linux VM 정보
+- **IP**: 192.168.32.128
+- **OS**: Rocky Linux
+- **접속**: SSH root@192.168.32.128
+- **용도**: n8n 워크플로우 서버 운영
+
+### n8n → NAS 연동 계획
+1. **Rocky VM에 n8n 설치중**
+   - 클로드 데스크탑이 현재 설치 진행중
+   - 설치 완료 후 NAS 접근 테스트 필요
+
+2. **NAS 접근 방법**
+   - SSH: Synology NAS SSH 서비스 활성화 필요
+   - Synology API: REST API 호출
+   - SMB/CIFS: 네트워크 드라이브 마운트
+   - SFTP: 파일 전송 프로토콜
+
+3. **보안 고려사항** (250701_n8n.md 참조)
+   - JWT 인증 사용
+   - Cloudflare Tunnel 또는 로컬 SSH 접근
+   - NAS 외부 직접 노출 금지
+
+### MCP 서버 설정 파일 경로
+- **Claude Desktop**: /mnt/c/Users/sp1/AppData/Roaming/Claude/claude_desktop_config.json
+- **Claude Code**: /home/sp1/.config/claude/claude_code_config.json
+
+### 다음 단계
+1. Rocky VM에서 NAS ping 테스트
+   - ping ds920
+   - ping ds916
+   
+2. NAS SSH 서비스 확인
+   - SSH 포트 개방 여부
+   - 접속 계정 권한
+   
+3. n8n 워크플로우 설계
+   - Webhook 엔드포인트 설정
+   - SSH/API 노드 구성
+   - 파일 작업 자동화 구현
+
+## 중요 사항
+- Claude Code와 Claude Desktop이 동일한 SSH 서버 공유
+- 허용된 명령어만 실행 가능 (whitelist 적용)
+- Rocky VM이 중간 서버 역할로 NAS 접근 보안 강화
+
+## 관련 문서
+- 250701_n8n.md: NAS 자동화 시나리오
+- 웹대시보드 NAS 자동화 흐름도 구현 완료
