@@ -1,0 +1,194 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Pretendard 폰트 import */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+
+@layer base {
+  :root {
+    /* Toss-inspired color palette */
+    --primary: #0064FF;
+    --primary-hover: #0051CC;
+    --gray-50: #F9FAFB;
+    --gray-100: #F2F4F6;
+    --gray-200: #E5E8EB;
+    --gray-300: #D1D6DB;
+    --gray-400: #98A2B3;
+    --gray-500: #667085;
+    --gray-600: #475467;
+    --gray-700: #344054;
+    --gray-800: #1D2939;
+    --gray-900: #101828;
+    --success: #12B76A;
+    --warning: #F79009;
+    --error: #F04438;
+    --info: #0BA5EC;
+  }
+  
+  html {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  body {
+    @apply text-gray-900 bg-gray-50;
+    font-feature-settings: 'tnum';
+  }
+  
+  /* Remove spinner from number inputs */
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+}
+
+@layer components {
+  /* Toss-style card */
+  .card-toss {
+    @apply bg-white rounded-2xl border border-gray-100 p-6;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Toss-style button */
+  .btn-toss-primary {
+    @apply bg-gray-900 hover:bg-gray-800 text-white font-medium py-3 px-6 rounded-xl transition-all duration-200;
+    font-weight: 600;
+  }
+  
+  .btn-toss-secondary {
+    @apply bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-xl transition-all duration-200 border border-gray-200;
+    font-weight: 600;
+  }
+  
+  .btn-toss-ghost {
+    @apply text-gray-700 hover:bg-gray-50 font-medium py-2 px-4 rounded-lg transition-all duration-200;
+  }
+  
+  /* Toss-style input */
+  .input-toss {
+    @apply w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400;
+    @apply focus:bg-white focus:border-gray-400 focus:outline-none transition-all duration-200;
+  }
+  
+  /* Toss-style select */
+  .select-toss {
+    @apply appearance-none bg-white border border-gray-200 rounded-lg px-3 py-1.5 pr-8 text-sm;
+    @apply focus:outline-none focus:border-gray-300 transition-all duration-200;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+  }
+  
+  /* Navigation items */
+  .nav-item {
+    @apply px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200;
+  }
+  
+  .nav-item-active {
+    @apply bg-blue-50 text-blue-600;
+  }
+  
+  .nav-item-inactive {
+    @apply text-gray-600 hover:bg-gray-50;
+  }
+  
+  /* Sidebar menu items */
+  .sidebar-item {
+    @apply w-full text-left px-4 py-3 rounded-lg font-medium text-sm transition-all duration-200;
+  }
+  
+  .sidebar-item-active {
+    @apply bg-gray-900 text-white;
+  }
+  
+  .sidebar-item-inactive {
+    @apply text-gray-600 hover:bg-gray-50;
+  }
+  
+  /* Badge styles */
+  .badge-toss {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .badge-success {
+    @apply bg-green-100 text-green-800;
+  }
+  
+  .badge-info {
+    @apply bg-blue-100 text-blue-800;
+  }
+  
+  .badge-warning {
+    @apply bg-orange-100 text-orange-800;
+  }
+  
+  .badge-error {
+    @apply bg-red-100 text-red-800;
+  }
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #E5E8EB;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D1D6DB;
+}
+
+/* Table hover effect */
+.table-hover tbody tr:hover {
+  background-color: #F9FAFB;
+}
+
+/* Smooth number transitions */
+.number-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Loading skeleton */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
