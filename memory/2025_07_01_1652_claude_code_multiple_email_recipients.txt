@@ -1,0 +1,155 @@
+## 88ERP 오프라인 자동화 복수 이메일 수신자 기능 추가
+날짜: 2025-07-01 16:52
+작업자: Ann & Claude Code
+
+### 개요
+오프라인사업 > 자동화 페이지 설정 팝업에 복수 이메일 수신자 기능 추가
+- 여러 명에게 동시에 이메일 발송 가능
+- 이메일 추가/삭제 UI 구현
+- 워크플로우에서 수신자 수 표시
+
+### 구현 내용
+
+#### 1. 데이터 구조 변경
+- 기존: `email: 'ann@88toy.co.kr'` (단일 문자열)
+- 변경: `emails: ['ann@88toy.co.kr']` (배열)
+
+```typescript
+// 기본값 설정
+{
+  emails: ['ann@88toy.co.kr'],
+  dataPath: store.dataPath || '',
+  supabaseUrl: '',
+  autoStart: false,
+  // ... 기타 설정
+}
+```
+
+#### 2. 이메일 관리 함수
+```typescript
+// 이메일 추가
+const handleAddEmail = (storeId) => {
+  setStoreSettings(prev => ({
+    ...prev,
+    [storeId]: {
+      ...prev[storeId],
+      emails: [...(prev[storeId]?.emails || []), '']
+    }
+  }));
+};
+
+// 이메일 삭제
+const handleRemoveEmail = (storeId, emailIndex) => {
+  setStoreSettings(prev => ({
+    ...prev,
+    [storeId]: {
+      ...prev[storeId],
+      emails: prev[storeId].emails.filter((_, index) => index !== emailIndex)
+    }
+  }));
+};
+```
+
+#### 3. UI 구현
+- 각 이메일마다 독립적인 입력 필드
+- 삭제 버튼 (휴지통 아이콘) - 이메일이 2개 이상일 때만 표시
+- "+ 이메일 추가" 버튼 - 점선 테두리 스타일
+
+```typescript
+<div className="space-y-2">
+  {(storeSettings[settingsModal.storeId]?.emails || ['ann@88toy.co.kr']).map((email, index) => (
+    <div key={index} className="flex items-center gap-2">
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => {
+          const newEmails = [...(storeSettings[settingsModal.storeId]?.emails || [])];
+          newEmails[index] = e.target.value;
+          setStoreSettings(prev => ({
+            ...prev,
+            [settingsModal.storeId]: {
+              ...prev[settingsModal.storeId],
+              emails: newEmails
+            }
+          }));
+        }}
+        className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+      />
+      {(storeSettings[settingsModal.storeId]?.emails?.length || 1) > 1 && (
+        <button onClick={() => handleRemoveEmail(settingsModal.storeId, index)}>
+          삭제
+        </button>
+      )}
+    </div>
+  ))}
+  <button onClick={() => handleAddEmail(settingsModal.storeId)}>
+    + 이메일 추가
+  </button>
+</div>
+```
+
+#### 4. 워크플로우 표시 개선
+- 단일 수신자: 이메일 주소 그대로 표시
+- 복수 수신자: "첫번째이메일 외 N명" 형식
+
+```typescript
+{step === '이메일 발송' && (
+  <span>
+    {storeSettings[store.id]?.emails?.length > 0 
+      ? (storeSettings[store.id].emails.length === 1 
+          ? storeSettings[store.id].emails[0] 
+          : `${storeSettings[store.id].emails[0]} 외 ${storeSettings[store.id].emails.length - 1}명`)
+      : 'ann@88toy.co.kr'}
+  </span>
+)}
+```
+
+### UI/UX 특징
+
+1. **직관적인 인터페이스**
+   - 이메일 추가는 점선 버튼으로 명확히 구분
+   - 삭제는 각 이메일별 휴지통 아이콘
+
+2. **최소 1개 이메일 유지**
+   - 마지막 남은 이메일은 삭제 불가
+   - 기본값으로 ann@88toy.co.kr 제공
+
+3. **실시간 업데이트**
+   - 설정 변경 시 워크플로우 표시 즉시 반영
+   - 각 이메일 입력란 독립적으로 수정 가능
+
+### 사용 시나리오
+
+1. **팀 전체 공유**
+   - ann@88toy.co.kr (담당자)
+   - team@88toy.co.kr (팀 메일)
+   - manager@88toy.co.kr (관리자)
+
+2. **백업 수신자 설정**
+   - 주 담당자와 부담당자 동시 설정
+   - 휴가/부재 시 대체 인원 추가
+
+3. **거래처별 차별화**
+   - 중요 거래처는 여러 명이 모니터링
+   - 일반 거래처는 담당자만 수신
+
+### 향후 개선 사항
+
+1. **이메일 유효성 검사**
+   - 올바른 이메일 형식 확인
+   - 중복 이메일 방지
+
+2. **이메일 그룹 템플릿**
+   - 자주 사용하는 수신자 그룹 저장
+   - 드롭다운으로 빠른 선택
+
+3. **발송 옵션**
+   - TO, CC, BCC 구분
+   - 수신자별 권한 설정
+
+### 파일 위치
+/home/sp1/88ERP/projects/web-dashboard/app/(dashboard)/offline/automation/page.tsx
+
+### Git 커밋 정보
+- 커밋 메시지: "Add: 오프라인 자동화 복수 이메일 수신자 기능 - 여러 명 동시 발송"
+- GitHub: https://github.com/kimsooim/88ERP_WSL
