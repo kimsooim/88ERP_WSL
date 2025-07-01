@@ -1,0 +1,79 @@
+# 88ERP 웹대시보드 개발 진행사항
+날짜: 2025-01-07
+작성자: Claude Code
+
+## 오늘 작업 내용
+
+### 1. 광고관리 페이지 추가 및 수정
+- **온라인사업 광고관리 페이지 추가**
+  - 경로: /online/advertising
+  - B2C 중심의 광고 관리 (네이버, 카카오, 구글, 페이스북 등)
+  - ROAS 452%, 전환율 3.8% 등 실제 온라인 사업 지표 반영
+
+- **토이사업 광고관리 페이지 추가**
+  - 경로: /toy/advertising  
+  - B2B 검색광고 특화 (구글 애즈, 네이버 파워링크만)
+  - 4개 탭 구조: 성과 개요, 키워드 관리, 유입/전환 분석, 예산 관리
+  - ROAS 3,602% 등 B2B 특성에 맞는 높은 수익률 반영
+
+- **오프라인사업 광고관리 제거**
+  - 오프라인 사업은 광고가 없어서 메뉴에서 제거
+
+### 2. 구글 vs 네이버 성과 비교 섹션 추가
+- 토이사업 광고관리 성과 개요 탭에 상세 비교 추가
+- 각 플랫폼별 주요 지표 시각화:
+  - 구글: ROAS 3,825%, CTR 0.87%, CPL 54,907원
+  - 네이버: ROAS 3,422%, 전환율 4.18%, CPL 51,439원
+- 핵심 인사이트 제공 (노출수, 전환율, 수익성 비교)
+
+### 3. 노션 연동 참고
+- 토이사업부 광고관리 노션 페이지 참조
+- 노출수, 클릭수, 전환수, 비용 등 주요 KPI 반영
+- 유입/전환 퍼널 분석 구조 적용
+
+### 4. 개인 자동화 페이지 (mypage/automation)
+- 개인 업무 자동화 규칙 관리 기능
+- 자동화 통계 대시보드 (활성 규칙 12개, 절약 시간 6.2시간 등)
+- 자동화 규칙 목록 및 실행 로그
+- 추천 템플릿 및 인사이트 제공
+
+## 프로젝트 구조
+- Next.js 14 App Router 사용
+- TypeScript + Tailwind CSS
+- 경로: /home/sp1/88ERP/projects/web-dashboard/
+
+## 메뉴 구조 변경사항
+### layout.tsx 수정 내역:
+- 온라인사업: 광고관리 메뉴 추가 (line 22)
+- 오프라인사업: 광고관리 메뉴 제거
+- 토이사업: 생산관리 하위에 광고관리 추가 (line 43)
+
+## 다음 단계 추천
+1. 유입/전환 분석 탭 완성 (퍼널 차트, 전환 경로 분석)
+2. 예산 관리 탭 구현 (월별 예산 계획, 실행률 모니터링)
+3. 키워드 자동 최적화 기능 추가
+4. 광고 성과 자동 리포팅 기능 구현
+5. Supabase 연동하여 실제 데이터 연결
+
+## 기술 스택
+- Frontend: Next.js 14, TypeScript, Tailwind CSS
+- UI Components: 커스텀 card, btn 컴포넌트
+- Icons: react-icons/fi
+- State Management: React useState Hook
+- Routing: Next.js App Router
+
+## 주요 파일 위치
+- /app/(dashboard)/layout.tsx - 대시보드 레이아웃 및 메뉴
+- /app/(dashboard)/online/advertising/page.tsx - 온라인 광고관리
+- /app/(dashboard)/toy/advertising/page.tsx - 토이 광고관리
+- /app/(dashboard)/mypage/automation/page.tsx - 개인 자동화
+
+## 빌드 상태
+- 개발 서버 실행중 (포트 3000)
+- JSX 구문 오류 수정 완료
+- 타입 에러 없음
+
+## MCP 서버 연동 관련
+- Notion MCP 서버 정상 연결됨
+- 토이사업부 광고관리 페이지 접근 성공
+- 향후 Supabase MCP 서버 연동 예정
