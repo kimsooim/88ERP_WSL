@@ -1,0 +1,75 @@
+# 2025년 7월 2일 - 웹대시보드 외부접속 설정 및 RustDesk 설치
+
+## 1. MCP 파일 경로 확인
+- 클로드 코드: /home/sp1/.config/claude/claude_code_config.json
+- 클로드 데스크탑: /mnt/c/Users/sp1/AppData/Roaming/Claude/claude_desktop_config.json
+
+## 2. 웹대시보드 외부 접속 설정
+### 문제 상황
+- 초기 실행: npm run dev (localhost:3000만 바인딩됨)
+- 외부 접속 불가능 상태
+
+### 해결 방법
+1. package.json 수정하여 --host 0.0.0.0 옵션 추가
+   ```json
+   "scripts": {
+     "dev": "next dev --host 0.0.0.0",
+     "build": "next build",
+     "start": "next start --host 0.0.0.0"
+   }
+   ```
+
+2. PM2로 백그라운드 실행
+   - PM2 설치: npm install -g pm2
+   - ecosystem.config.js 파일 생성
+   - 실행: pm2 start ecosystem.config.js
+   - 프로세스명: 88erp-dashboard
+
+### 접속 정보
+- 내부 접속: http://localhost:3000
+- 외부 접속: http://172.30.194.247:3000
+- 외부 접속 성공 확인됨
+
+## 3. RustDesk 설치
+### server 컴퓨터 (172.20.158.172)
+- RustDesk 서버 설치 완료
+- 원격 접속 서버로 활용 예정
+
+### sp1 컴퓨터
+- Windows용 RustDesk 클라이언트 다운로드 완료
+- 다운로드 경로: C:\temp\rustdesk-1.3.6-x86_64.exe
+- 설치 대기 중
+
+## 4. 컴퓨터 역할 정의 문서 확인
+파일 경로: /home/sp1/88ERP/250702_컴퓨터역할정의.md
+
+### 4대 컴퓨터 구성
+1. **server (서버용 컴퓨터)**
+   - 역할: 웹서버, 백엔드 API, 데이터베이스
+   - IP: 172.20.158.172 (내부), 172.30.194.247 (WSL)
+   - 용도: 웹대시보드 호스팅, PM2 운영
+
+2. **sp1 (개발용 컴퓨터)**
+   - 역할: 개발, 테스트, Claude 작업
+   - WSL Ubuntu 환경
+   - 88ERP 프로젝트 메인 개발
+
+3. **NAS (시놀로지)**
+   - DS920+, DS916+ 2대 운영
+   - 데이터 백업, 파일 서버
+   - 네트워크 드라이브: I:, Y:
+
+4. **mac (디자인용 컴퓨터)**
+   - 역할: 디자인, 문서 작업
+   - 캐릭터 디자인, 그래픽 작업
+
+## 5. 현재 진행 상황
+- server 컴퓨터에서 포트포워딩 설정 진행 중
+- 웹대시보드 외부 접속 테스트 완료
+- PM2로 안정적인 백그라운드 실행 중
+- RustDesk 클라이언트 설치 준비
+
+## 6. 다음 작업 예정
+1. server 컴퓨터 포트포워딩 완료
+2. RustDesk 클라이언트 설치 및 연결
+3. 도메인 연결 (db.88toy.co.kr)
