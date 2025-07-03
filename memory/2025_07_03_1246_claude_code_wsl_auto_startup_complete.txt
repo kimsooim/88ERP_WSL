@@ -1,0 +1,37 @@
+=== 2025년 7월 3일 - WSL 자동 시작 설정 완료 ===
+
+## 문제 상황
+- 컴퓨터 재부팅 시 WSL 내 웹서버(pm2)가 자동으로 시작되지 않음
+- 매번 수동으로 WSL 터미널 열고 pm2 시작해야 했음
+
+## 해결 방법 구현
+1. WSL 자동 시작 설정
+   - /home/sp1/.bashrc에 pm2 자동 실행 코드 추가
+   - pm2 resurrect으로 저장된 프로세스 자동 복원
+
+2. WSL 전용 시작 스크립트 생성
+   - 파일: /home/sp1/88ERP/tools/scripts/wsl-startup.sh
+   - 기능: pm2 시작, 로그 기록, 상태 확인
+   - 로그 위치: /home/sp1/88ERP/logs/wsl-startup.log
+
+3. Windows 백그라운드 실행 설정
+   - VBScript: C:\88ERP-Fresh\wsl-background-startup.vbs
+   - 배치파일: C:\88ERP-Fresh\start-wsl-services.bat
+   - 설정가이드: C:\88ERP-Fresh\작업스케줄러_설정방법.txt
+
+## 작업 스케줄러 설정
+- 작업명: WSL 88ERP 서비스 자동 시작
+- 트리거: Windows 시작 시
+- 동작: wsl-background-startup.vbs 실행
+- 백그라운드로 WSL 실행 (콘솔창 없음)
+
+## 결과
+- Windows 재부팅 시 WSL과 pm2 자동 시작
+- 웹대시보드(http://localhost:3000) 자동 실행
+- 터미널 열지 않아도 서버 계속 작동
+
+## 추가 설정 필요
+- Windows 작업 스케줄러에 수동으로 작업 등록 필요
+- 설정 방법은 작업스케줄러_설정방법.txt 참조
+
+[작성자: claude code / Ann]
