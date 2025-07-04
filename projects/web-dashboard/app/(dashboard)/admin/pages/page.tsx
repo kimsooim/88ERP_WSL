@@ -246,7 +246,7 @@ export default function AdminLoginSettingsPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead>
                 <tr className="bg-gray-50">
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                       onClick={() => handleSort('profile')}>
                     <div className="flex items-center gap-1">
                       <span>프로필</span>
@@ -256,7 +256,7 @@ export default function AdminLoginSettingsPage() {
                       </div>
                     </div>
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                       onClick={() => handleSort('name')}>
                     <div className="flex items-center gap-1">
                       <span>닉네임</span>
@@ -266,7 +266,7 @@ export default function AdminLoginSettingsPage() {
                       </div>
                     </div>
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                       onClick={() => handleSort('userId')}>
                     <div className="flex items-center gap-1">
                       <span>아이디</span>
@@ -276,7 +276,7 @@ export default function AdminLoginSettingsPage() {
                       </div>
                     </div>
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                       onClick={() => handleSort('password')}>
                     <div className="flex items-center gap-1">
                       <span>비밀번호</span>
@@ -286,10 +286,10 @@ export default function AdminLoginSettingsPage() {
                       </div>
                     </div>
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     액션
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                       onClick={() => handleSort('role')}>
                     <div className="flex items-center gap-1">
                       <span>권한그룹</span>
@@ -299,7 +299,7 @@ export default function AdminLoginSettingsPage() {
                       </div>
                     </div>
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                       onClick={() => handleSort('lastModified')}>
                     <div className="flex items-center gap-1">
                       <span>마지막 수정일</span>
@@ -419,7 +419,7 @@ export default function AdminLoginSettingsPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead>
                 <tr className="bg-gray-50">
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                       onClick={() => handleLoginSort('profile')}>
                     <div className="flex items-center gap-1">
                       <span>프로필</span>
@@ -429,7 +429,7 @@ export default function AdminLoginSettingsPage() {
                       </div>
                     </div>
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                       onClick={() => handleLoginSort('name')}>
                     <div className="flex items-center gap-1">
                       <span>닉네임</span>
@@ -439,7 +439,7 @@ export default function AdminLoginSettingsPage() {
                       </div>
                     </div>
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                       onClick={() => handleLoginSort('department')}>
                     <div className="flex items-center gap-1">
                       <span>부서</span>
@@ -449,7 +449,7 @@ export default function AdminLoginSettingsPage() {
                       </div>
                     </div>
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                       onClick={() => handleLoginSort('team')}>
                     <div className="flex items-center gap-1">
                       <span>팀</span>
@@ -459,7 +459,7 @@ export default function AdminLoginSettingsPage() {
                       </div>
                     </div>
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                       onClick={() => handleLoginSort('status')}>
                     <div className="flex items-center gap-1">
                       <span>접속여부</span>
@@ -469,7 +469,7 @@ export default function AdminLoginSettingsPage() {
                       </div>
                     </div>
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                  <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                       onClick={() => handleLoginSort('lastLogin')}>
                     <div className="flex items-center gap-1">
                       <span>마지막 로그인</span>

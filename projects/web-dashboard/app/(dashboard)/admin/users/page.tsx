@@ -749,13 +749,13 @@ export default function AdminUsersPage() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead>
               <tr className="bg-gray-50">
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   프로필
                 </th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <button 
                     onClick={() => handleSort('name')}
-                    className="flex items-center space-x-1 hover:text-gray-700"
+                    className="flex items-center space-x-1 hover:text-gray-700 w-full"
                   >
                     <span>닉네임/이름</span>
                     <div className="flex flex-col">
@@ -764,7 +764,7 @@ export default function AdminUsersPage() {
                     </div>
                   </button>
                 </th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <button 
                     onClick={() => handleSort('email')}
                     className="flex items-center space-x-1 hover:text-gray-700"
@@ -776,7 +776,7 @@ export default function AdminUsersPage() {
                     </div>
                   </button>
                 </th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <button 
                     onClick={() => handleSort('department')}
                     className="flex items-center space-x-1 hover:text-gray-700"
@@ -788,7 +788,7 @@ export default function AdminUsersPage() {
                     </div>
                   </button>
                 </th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <button 
                     onClick={() => handleSort('jobTitle')}
                     className="flex items-center space-x-1 hover:text-gray-700"
@@ -800,7 +800,7 @@ export default function AdminUsersPage() {
                     </div>
                   </button>
                 </th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <button 
                     onClick={() => handleSort('role')}
                     className="flex items-center space-x-1 hover:text-gray-700"
@@ -812,7 +812,7 @@ export default function AdminUsersPage() {
                     </div>
                   </button>
                 </th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <button 
                     onClick={() => handleSort('birthDate')}
                     className="flex items-center space-x-1 hover:text-gray-700"
@@ -824,7 +824,7 @@ export default function AdminUsersPage() {
                     </div>
                   </button>
                 </th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <button 
                     onClick={() => handleSort('joinDate')}
                     className="flex items-center space-x-1 hover:text-gray-700"
@@ -836,13 +836,13 @@ export default function AdminUsersPage() {
                     </div>
                   </button>
                 </th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   연락처/주소
                 </th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   상태
                 </th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   편집
                 </th>
               </tr>
