@@ -420,6 +420,7 @@ export default function AdminSystemPage() {
   const [roles, setRoles] = useState<Role[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [pagePermissions, setPagePermissions] =
     useState<PagePermission[]>(defaultPages);
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
@@ -432,9 +433,16 @@ export default function AdminSystemPage() {
     const savedDepartments = localStorage.getItem("88erp_departments");
     const savedMembers = localStorage.getItem("88erp_team_members");
     const savedPermissions = localStorage.getItem("88erp_page_permissions");
+    const savedUsers = localStorage.getItem("users");
 
     if (savedRoles) {
-      setRoles(JSON.parse(savedRoles));
+      const parsedRoles = JSON.parse(savedRoles);
+      // permissions가 배열이 아닌 경우 배열로 변환
+      const fixedRoles = parsedRoles.map((role: any) => ({
+        ...role,
+        permissions: Array.isArray(role.permissions) ? role.permissions : []
+      }));
+      setRoles(fixedRoles);
     } else {
       // 기본 역할 설정
       setRoles([
@@ -626,6 +634,17 @@ export default function AdminSystemPage() {
       ]);
     }
 
+    if (savedUsers) {
+      try {
+        setUsers(JSON.parse(savedUsers));
+      } catch (error) {
+        console.error("Error parsing users:", error);
+        setUsers([]);
+      }
+    } else {
+      setUsers([]);
+    }
+
     if (savedPermissions) {
       try {
         setPagePermissions(JSON.parse(savedPermissions));
@@ -712,6 +731,7 @@ export default function AdminSystemPage() {
 
   // 역할 수정
   const startEditRole = (role: Role) => {
+    console.log('startEditRole called with:', role);
     setEditingRole(role.id);
     setEditRoleData({ ...role });
   };
@@ -731,6 +751,11 @@ export default function AdminSystemPage() {
       setEditingRole(null);
       setEditRoleData(null);
     }
+  };
+
+  // 권한그룹에 속한 사용자들을 가져오는 함수
+  const getUsersByRole = (roleName: string) => {
+    return users.filter(user => user.role === roleName);
   };
 
   // 역할 삭제
@@ -1159,20 +1184,23 @@ export default function AdminSystemPage() {
               <table className="min-w-full">
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-200">
-                    <th className="w-12 px-2 py-2"></th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="w-12 px-2 py-1"></th>
+                    <th className="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       권한그룹명
                     </th>
-                    <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      소속 사용자
+                    </th>
+                    <th className="px-3 py-1 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       읽기
                     </th>
-                    <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-1 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       수정
                     </th>
-                    <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-1 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       삭제
                     </th>
-                    <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-1 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       작업
                     </th>
                   </tr>
@@ -1181,7 +1209,7 @@ export default function AdminSystemPage() {
                   {newRole !== null && (
                     <tr className="bg-blue-50">
                       <td></td>
-                      <td className="px-3 py-2">
+                      <td className="px-3 py-1">
                         <input
                           type="text"
                           placeholder="권한그룹명"
@@ -1193,7 +1221,10 @@ export default function AdminSystemPage() {
                           autoFocus
                         />
                       </td>
-                      <td className="px-3 py-2 text-center">
+                      <td className="px-3 py-1">
+                        <span className="text-xs text-gray-400">신규 생성</span>
+                      </td>
+                      <td className="px-3 py-1 text-center">
                         <input
                           type="checkbox"
                           checked={newRole.permissions.includes("read")}
@@ -1215,7 +1246,7 @@ export default function AdminSystemPage() {
                           className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                         />
                       </td>
-                      <td className="px-3 py-2 text-center">
+                      <td className="px-3 py-1 text-center">
                         <input
                           type="checkbox"
                           checked={newRole.permissions.includes("modify")}
@@ -1237,7 +1268,7 @@ export default function AdminSystemPage() {
                           className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                         />
                       </td>
-                      <td className="px-3 py-2 text-center">
+                      <td className="px-3 py-1 text-center">
                         <input
                           type="checkbox"
                           checked={newRole.permissions.includes("delete")}
@@ -1259,7 +1290,7 @@ export default function AdminSystemPage() {
                           className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                         />
                       </td>
-                      <td className="px-3 py-2 text-right">
+                      <td className="px-3 py-1 text-right">
                         <div className="flex gap-1 justify-end">
                           <button
                             onClick={addRole}
@@ -1308,7 +1339,7 @@ export default function AdminSystemPage() {
                       </td>
                       {editingRole === role.id && editRoleData ? (
                         <>
-                          <td className="px-3 py-2">
+                          <td className="px-3 py-1">
                             <input
                               type="text"
                               value={editRoleData.name}
@@ -1321,91 +1352,95 @@ export default function AdminSystemPage() {
                               className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                           </td>
-                          <td className="px-3 py-2 text-center">
+                          <td className="px-3 py-1">
+                            <div className="flex flex-wrap gap-1">
+                              {getUsersByRole(role.name).slice(0, 3).map((user, index) => (
+                                <div key={index} className="flex items-center bg-gray-100 rounded-full px-1 py-0.5">
+                                  {user.profileImage ? (
+                                    <img 
+                                      src={user.profileImage} 
+                                      alt={user.name}
+                                      className="w-4 h-4 rounded-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="w-4 h-4 rounded-full bg-gray-300 flex items-center justify-center">
+                                      <span className="text-xs text-gray-600 font-medium">
+                                        {user.name.charAt(0)}
+                                      </span>
+                                    </div>
+                                  )}
+                                  <span className="ml-1 text-xs text-gray-700">{user.name}</span>
+                                </div>
+                              ))}
+                              {getUsersByRole(role.name).length > 3 && (
+                                <span className="text-xs text-gray-500">+{getUsersByRole(role.name).length - 3}</span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-3 py-1 text-center">
                             <input
                               type="checkbox"
-                              checked={editRoleData.permissions.includes(
-                                "read",
-                              )}
+                              checked={Array.isArray(editRoleData.permissions) && editRoleData.permissions.includes("read")}
                               onChange={(e) => {
+                                const currentPermissions = Array.isArray(editRoleData.permissions) ? editRoleData.permissions : [];
                                 if (e.target.checked) {
                                   setEditRoleData({
                                     ...editRoleData,
-                                    permissions: [
-                                      ...editRoleData.permissions,
-                                      "read",
-                                    ],
+                                    permissions: [...currentPermissions, "read"],
                                   });
                                 } else {
                                   setEditRoleData({
                                     ...editRoleData,
-                                    permissions:
-                                      editRoleData.permissions.filter(
-                                        (p) => p !== "read",
-                                      ),
+                                    permissions: currentPermissions.filter((p) => p !== "read"),
                                   });
                                 }
                               }}
                               className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                             />
                           </td>
-                          <td className="px-3 py-2 text-center">
+                          <td className="px-3 py-1 text-center">
                             <input
                               type="checkbox"
-                              checked={editRoleData.permissions.includes(
-                                "modify",
-                              )}
+                              checked={Array.isArray(editRoleData.permissions) && editRoleData.permissions.includes("modify")}
                               onChange={(e) => {
+                                const currentPermissions = Array.isArray(editRoleData.permissions) ? editRoleData.permissions : [];
                                 if (e.target.checked) {
                                   setEditRoleData({
                                     ...editRoleData,
-                                    permissions: [
-                                      ...editRoleData.permissions,
-                                      "modify",
-                                    ],
+                                    permissions: [...currentPermissions, "modify"],
                                   });
                                 } else {
                                   setEditRoleData({
                                     ...editRoleData,
-                                    permissions:
-                                      editRoleData.permissions.filter(
-                                        (p) => p !== "modify",
-                                      ),
+                                    permissions: currentPermissions.filter((p) => p !== "modify"),
                                   });
                                 }
                               }}
                               className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                             />
                           </td>
-                          <td className="px-3 py-2 text-center">
+                          <td className="px-3 py-1 text-center">
                             <input
                               type="checkbox"
-                              checked={editRoleData.permissions.includes(
-                                "delete",
-                              )}
+                              checked={Array.isArray(editRoleData.permissions) && editRoleData.permissions.includes("delete")}
                               onChange={(e) => {
+                                const currentPermissions = Array.isArray(editRoleData.permissions) ? editRoleData.permissions : [];
                                 if (e.target.checked) {
                                   setEditRoleData({
                                     ...editRoleData,
-                                    permissions: [
-                                      ...editRoleData.permissions,
-                                      "delete",
-                                    ],
+                                    permissions: [...currentPermissions, "delete"],
                                   });
                                 } else {
                                   setEditRoleData({
                                     ...editRoleData,
-                                    permissions:
-                                      editRoleData.permissions.filter(
-                                        (p) => p !== "delete",
-                                      ),
+                                    permissions: currentPermissions.filter((p) => p !== "delete"),
                                   });
                                 }
                               }}
                               className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                             />
                           </td>
-                          <td className="px-3 py-2 text-right">
+                          <td className="px-3 py-1 text-right">
                             <div className="flex gap-1 justify-end">
                               <button
                                 onClick={saveEditRole}
@@ -1427,33 +1462,61 @@ export default function AdminSystemPage() {
                         </>
                       ) : (
                         <>
-                          <td className="px-3 py-2">
-                            <h4 className="font-medium text-sm text-gray-900">
+                          <td className="px-3 py-1">
+                            <h4 className="font-medium text-xs text-gray-900">
                               {role.name}
                             </h4>
                           </td>
-                          <td className="px-3 py-2 text-center">
-                            {role.permissions?.read ? (
+                          <td className="px-3 py-1">
+                            <div className="flex flex-wrap gap-1">
+                              {getUsersByRole(role.name).slice(0, 3).map((user, index) => (
+                                <div key={index} className="flex items-center bg-gray-100 rounded-full px-1 py-0.5">
+                                  {user.profileImage ? (
+                                    <img 
+                                      src={user.profileImage} 
+                                      alt={user.name}
+                                      className="w-4 h-4 rounded-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="w-4 h-4 rounded-full bg-gray-300 flex items-center justify-center">
+                                      <span className="text-xs text-gray-600 font-medium">
+                                        {user.name.charAt(0)}
+                                      </span>
+                                    </div>
+                                  )}
+                                  <span className="ml-1 text-xs text-gray-700">{user.name}</span>
+                                </div>
+                              ))}
+                              {getUsersByRole(role.name).length > 3 && (
+                                <span className="text-xs text-gray-500">+{getUsersByRole(role.name).length - 3}</span>
+                              )}
+                              {getUsersByRole(role.name).length === 0 && (
+                                <span className="text-xs text-gray-400">사용자 없음</span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-3 py-1 text-center">
+                            {(Array.isArray(role.permissions) && (role.permissions.includes('read') || role.permissions.includes('all'))) ? (
                               <Check className="h-4 w-4 text-green-600 mx-auto" />
                             ) : (
                               <X className="h-4 w-4 text-gray-300 mx-auto" />
                             )}
                           </td>
-                          <td className="px-3 py-2 text-center">
-                            {role.permissions?.modify ? (
+                          <td className="px-3 py-1 text-center">
+                            {(Array.isArray(role.permissions) && (role.permissions.includes('modify') || role.permissions.includes('all'))) ? (
                               <Check className="h-4 w-4 text-green-600 mx-auto" />
                             ) : (
                               <X className="h-4 w-4 text-gray-300 mx-auto" />
                             )}
                           </td>
-                          <td className="px-3 py-2 text-center">
-                            {role.permissions?.delete ? (
+                          <td className="px-3 py-1 text-center">
+                            {(Array.isArray(role.permissions) && (role.permissions.includes('delete') || role.permissions.includes('all'))) ? (
                               <Check className="h-4 w-4 text-green-600 mx-auto" />
                             ) : (
                               <X className="h-4 w-4 text-gray-300 mx-auto" />
                             )}
                           </td>
-                          <td className="px-3 py-2 text-right">
+                          <td className="px-3 py-1 text-right">
                             <div className="flex gap-1 justify-end">
                               <button
                                 onClick={() => startEditRole(role)}
@@ -1521,33 +1584,33 @@ export default function AdminSystemPage() {
                       <React.Fragment key={category.path}>
                         {/* 카테고리 행 */}
                         <tr className="bg-gray-50">
-                          <td className="px-4 py-3">
+                          <td className="px-4 py-2">
                             <button
                               onClick={() => toggleCategory(category.category)}
-                              className="flex items-center gap-2 font-medium text-gray-900"
+                              className="flex items-center gap-2 font-medium text-xs text-gray-900"
                             >
                               {expandedCategories.includes(
                                 category.category,
                               ) ? (
-                                <ChevronDown className="w-4 h-4" />
+                                <ChevronDown className="w-3 h-3" />
                               ) : (
-                                <ChevronRight className="w-4 h-4" />
+                                <ChevronRight className="w-3 h-3" />
                               )}
                               {category.name}
                             </button>
                           </td>
                           {roles.map((role) => (
-                            <td key={role.id} className="px-4 py-3 text-center">
+                            <td key={role.id} className="px-4 py-2 text-center">
                               <button
                                 onClick={() =>
                                   togglePermission(category.path, role.id, true)
                                 }
-                                className="p-1"
+                                className="p-0.5"
                               >
                                 {category.allowedRoles.includes(role.id) ? (
-                                  <Eye className="w-5 h-5 text-green-600" />
+                                  <Eye className="w-4 h-4 text-green-600" />
                                 ) : (
-                                  <EyeOff className="w-5 h-5 text-gray-300" />
+                                  <EyeOff className="w-4 h-4 text-gray-300" />
                                 )}
                               </button>
                             </td>
@@ -1558,26 +1621,26 @@ export default function AdminSystemPage() {
                         {expandedCategories.includes(category.category) &&
                           category.children?.map((page) => (
                             <tr key={page.path} className="hover:bg-gray-50">
-                              <td className="px-4 py-3 pl-12">
-                                <span className="text-sm text-gray-700">
+                              <td className="px-4 py-1 pl-12">
+                                <span className="text-xs text-gray-700">
                                   {page.name}
                                 </span>
                               </td>
                               {roles.map((role) => (
                                 <td
                                   key={role.id}
-                                  className="px-4 py-3 text-center"
+                                  className="px-4 py-1 text-center"
                                 >
                                   <button
                                     onClick={() =>
                                       togglePermission(page.path, role.id)
                                     }
-                                    className="p-1"
+                                    className="p-0.5"
                                   >
                                     {page.allowedRoles.includes(role.id) ? (
-                                      <Eye className="w-4 h-4 text-green-600" />
+                                      <Eye className="w-3 h-3 text-green-600" />
                                     ) : (
-                                      <EyeOff className="w-4 h-4 text-gray-300" />
+                                      <EyeOff className="w-3 h-3 text-gray-300" />
                                     )}
                                   </button>
                                 </td>

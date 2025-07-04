@@ -446,9 +446,14 @@ export default function MyAccountPage() {
               
               <h3 className="text-lg font-semibold text-gray-900">{user.name}</h3>
               <p className="text-sm text-gray-600">{user.email}</p>
-              <div className="mt-2">
+              <div className="mt-2 flex justify-center gap-2">
                 <span className="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
                   {user.role === 'admin' ? '관리자' : user.role === 'manager' ? '매니저' : '일반사용자'}
+                </span>
+                <span className={`inline-flex px-2.5 py-0.5 text-xs font-medium rounded-full ${
+                  profileForm.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {profileForm.status === 'active' ? '활성' : '비활성'}
                 </span>
               </div>
               
@@ -483,7 +488,7 @@ export default function MyAccountPage() {
           {/* 개인정보 수정 */}
           <div className="card">
             <div className="card-header flex justify-between items-center">
-              <h3 className="card-title">개인정보</h3>
+              <h3 className="card-title">나의정보</h3>
               {!isEditing && (
                 <button
                   onClick={() => setIsEditing(true)}
@@ -499,90 +504,81 @@ export default function MyAccountPage() {
             <div className="card-body">
               {isEditing ? (
                 <div className="space-y-6">
-                  {/* 기본 정보 섹션 */}
-                  <div>
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">기본 정보</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* 왼쪽 열: 기본정보 */}
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-gray-900 border-b pb-1 mb-2">기본정보</h4>
+                      
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">닉네임</label>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">닉네임</label>
                         <input
                           type="text"
                           value={profileForm.name}
                           onChange={(e) => setProfileForm(prev => ({ ...prev, name: e.target.value }))}
                           placeholder="표시될 이름"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">실제 이름</label>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">이름</label>
                         <input
                           type="text"
                           value={profileForm.realName}
                           onChange={(e) => setProfileForm(prev => ({ ...prev, realName: e.target.value }))}
                           placeholder="실제 이름"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">이메일</label>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">이메일</label>
                         <input
                           type="email"
                           value={profileForm.email}
                           onChange={(e) => setProfileForm(prev => ({ ...prev, email: e.target.value }))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">전화번호</label>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">전화번호</label>
                         <input
                           type="tel"
                           value={profileForm.phone}
                           onChange={(e) => setProfileForm(prev => ({ ...prev, phone: e.target.value }))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           placeholder="010-0000-0000"
                         />
                       </div>
-                      <div className="sm:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">주소</label>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">주소</label>
                         <input
                           type="text"
                           value={profileForm.address}
                           onChange={(e) => setProfileForm(prev => ({ ...prev, address: e.target.value }))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           placeholder="주소를 입력하세요"
                         />
                       </div>
                     </div>
-                  </div>
 
-                  {/* 인사 정보 섹션 */}
-                  <div>
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">인사 정보</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {/* 가운데 열: 개인정보 */}
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-gray-900 border-b pb-1 mb-2">개인정보</h4>
+                      
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">생년월일</label>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">생년월일</label>
                         <input
                           type="date"
                           value={profileForm.birthDate}
                           onChange={(e) => setProfileForm(prev => ({ ...prev, birthDate: e.target.value }))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">입사일</label>
-                        <input
-                          type="date"
-                          value={profileForm.joinDate}
-                          onChange={(e) => setProfileForm(prev => ({ ...prev, joinDate: e.target.value }))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">MBTI</label>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">MBTI</label>
                         <select
                           value={profileForm.mbti}
                           onChange={(e) => setProfileForm(prev => ({ ...prev, mbti: e.target.value }))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         >
                           <option value="">선택하세요</option>
                           <option value="INTJ">INTJ</option>
@@ -603,99 +599,83 @@ export default function MyAccountPage() {
                           <option value="ESFP">ESFP</option>
                         </select>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* 조직 정보 섹션 */}
-                  <div>
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">조직 정보</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">부서</label>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">입사일</label>
+                        <input
+                          type="date"
+                          value={profileForm.joinDate}
+                          onChange={(e) => setProfileForm(prev => ({ ...prev, joinDate: e.target.value }))}
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">근무 기간</label>
+                        <input
+                          type="text"
+                          value={profileForm.joinDate ? (() => {
+                            const period = calculateWorkPeriod(profileForm.joinDate);
+                            return `${period.years}년 ${period.months}개월 ${period.days}일`;
+                          })() : '-'}
+                          disabled
+                          className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-md bg-gray-50 text-gray-500"
+                        />
+                      </div>
+                    </div>
+
+                    {/* 오른쪽 열: 조직정보 */}
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-gray-900 border-b pb-1 mb-2">조직정보</h4>
+                      
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">부서</label>
                         <input
                           type="text"
                           value={profileForm.department}
                           disabled
-                          className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-md bg-gray-50 text-gray-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">팀</label>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">팀</label>
                         <input
                           type="text"
                           value={profileForm.team}
                           disabled
-                          className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-md bg-gray-50 text-gray-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">역할</label>
-                        <input
-                          type="text"
-                          value={profileForm.role}
-                          disabled
-                          className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">직급</label>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">직급</label>
                         <input
                           type="text"
                           value={profileForm.jobTitle}
                           disabled
-                          className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-md bg-gray-50 text-gray-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">포지션</label>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">포지션</label>
                         <input
                           type="text"
                           value={profileForm.position}
                           disabled
-                          className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-md bg-gray-50 text-gray-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">상태</label>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">업무역할</label>
                         <input
                           type="text"
-                          value={profileForm.status === 'active' ? '활성' : '비활성'}
+                          value={profileForm.workRole}
                           disabled
-                          className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-md bg-gray-50 text-gray-500"
+                          placeholder="담당하는 주요 업무"
                         />
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">퇴사일</label>
-                        <input
-                          type="date"
-                          value={profileForm.resignDate}
-                          disabled
-                          className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500"
-                        />
-                      </div>
-                      <div className="sm:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">퇴사사유</label>
-                        <input
-                          type="text"
-                          value={profileForm.resignReason}
-                          disabled
-                          className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500"
-                          placeholder="퇴사 시 관리자가 입력"
-                        />
-                      </div>
-                    </div>
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">업무역할</label>
-                      <textarea
-                        value={profileForm.workRole}
-                        onChange={(e) => setProfileForm(prev => ({ ...prev, workRole: e.target.value }))}
-                        placeholder="담당하는 주요 업무를 입력하세요"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        rows={2}
-                      />
                     </div>
                   </div>
 
+                  {/* 저장/취소 버튼 */}
                   <div className="flex justify-end gap-2 pt-4 border-t border-gray-200">
                     <button
                       onClick={handleEditCancel}
@@ -712,163 +692,97 @@ export default function MyAccountPage() {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-6">
-                  {/* 기본 정보 섹션 */}
-                  <div>
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">기본 정보</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">닉네임</label>
-                        <p className="text-sm text-gray-900">{user.name}</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">실제 이름</label>
-                        <p className="text-sm text-gray-900">{profileForm.realName || '-'}</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">이메일</label>
-                        <p className="text-sm text-gray-900">{user.email}</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">전화번호</label>
-                        <p className="text-sm text-gray-900">{profileForm.phone || '미등록'}</p>
-                      </div>
-                      <div className="sm:col-span-2">
-                        <label className="block text-sm font-medium text-gray-500 mb-1">주소</label>
-                        <p className="text-sm text-gray-900">{profileForm.address || '미등록'}</p>
-                      </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* 왼쪽 열: 기본정보 */}
+                  <div className="space-y-4">
+                    <h4 className="text-md font-medium text-gray-900 border-b pb-2">기본정보</h4>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500 mb-1">닉네임</label>
+                      <p className="text-sm text-gray-900">{user.name}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500 mb-1">이름</label>
+                      <p className="text-sm text-gray-900">{profileForm.realName || '-'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500 mb-1">이메일</label>
+                      <p className="text-sm text-gray-900">{user.email}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500 mb-1">전화번호</label>
+                      <p className="text-sm text-gray-900">{profileForm.phone || '미등록'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500 mb-1">주소</label>
+                      <p className="text-sm text-gray-900">{profileForm.address || '미등록'}</p>
                     </div>
                   </div>
 
-                  {/* 인사 정보 섹션 */}
-                  <div>
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">인사 정보</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">생년월일</label>
-                        <p className="text-sm text-gray-900">
-                          {profileForm.birthDate ? (
-                            <>
-                              {profileForm.birthDate}
-                              <span className="text-gray-500 ml-2">(만 {calculateAge(profileForm.birthDate)}세)</span>
-                            </>
-                          ) : '미등록'}
-                        </p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">입사일</label>
-                        <p className="text-sm text-gray-900">{profileForm.joinDate || '미등록'}</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">근무 기간</label>
-                        <p className="text-sm text-gray-900">
-                          {profileForm.joinDate ? (() => {
-                            const period = calculateWorkPeriod(profileForm.joinDate);
-                            return `${period.years}년 ${period.months}개월 ${period.days}일`;
-                          })() : '-'}
-                        </p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">MBTI</label>
-                        <p className="text-sm text-gray-900">{profileForm.mbti || '미등록'}</p>
-                      </div>
+                  {/* 가운데 열: 개인정보 */}
+                  <div className="space-y-4">
+                    <h4 className="text-md font-medium text-gray-900 border-b pb-2">개인정보</h4>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500 mb-1">생년월일</label>
+                      <p className="text-sm text-gray-900">
+                        {profileForm.birthDate ? (
+                          <>
+                            {profileForm.birthDate}
+                            <span className="text-gray-500 ml-2">(만 {calculateAge(profileForm.birthDate)}세)</span>
+                          </>
+                        ) : '미등록'}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500 mb-1">MBTI</label>
+                      <p className="text-sm text-gray-900">{profileForm.mbti || '미등록'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500 mb-1">입사일</label>
+                      <p className="text-sm text-gray-900">{profileForm.joinDate || '미등록'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500 mb-1">근무 기간</label>
+                      <p className="text-sm text-gray-900">
+                        {profileForm.joinDate ? (() => {
+                          const period = calculateWorkPeriod(profileForm.joinDate);
+                          return `${period.years}년 ${period.months}개월 ${period.days}일`;
+                        })() : '-'}
+                      </p>
                     </div>
                   </div>
 
-                  {/* 조직 정보 섹션 */}
-                  <div>
-                    <h4 className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">조직 정보</h4>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">부서</label>
-                        <p className="text-sm text-gray-900">{profileForm.department || user.department || '미지정'}</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">팀</label>
-                        <p className="text-sm text-gray-900">{profileForm.team || '팀 미지정'}</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">역할</label>
-                        <p className="text-sm text-gray-900">
-                          <span className={`inline-flex px-2.5 py-0.5 text-xs font-medium rounded-full ${
-                            profileForm.role === '관리자' ? 'bg-red-100 text-red-800' :
-                            profileForm.role === '매니저' ? 'bg-blue-100 text-blue-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
-                            {profileForm.role || '일반사용자'}
-                          </span>
-                        </p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">직급</label>
-                        <p className="text-sm text-gray-900">{profileForm.jobTitle || '직급 미지정'}</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">포지션</label>
-                        <p className="text-sm text-gray-900">{profileForm.position || '포지션 미지정'}</p>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-500 mb-1">상태</label>
-                        <p className="text-sm text-gray-900">
-                          <span className={`inline-flex px-2.5 py-0.5 text-xs font-medium rounded-full ${
-                            profileForm.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {profileForm.status === 'active' ? '활성' : '비활성'}
-                          </span>
-                        </p>
-                      </div>
-                      {profileForm.resignDate && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-500 mb-1">퇴사일</label>
-                          <p className="text-sm text-gray-900">{profileForm.resignDate}</p>
-                        </div>
-                      )}
-                      {profileForm.resignReason && (
-                        <div className="sm:col-span-2">
-                          <label className="block text-sm font-medium text-gray-500 mb-1">퇴사사유</label>
-                          <p className="text-sm text-gray-900">{profileForm.resignReason}</p>
-                        </div>
-                      )}
+                  {/* 오른쪽 열: 조직정보 */}
+                  <div className="space-y-4">
+                    <h4 className="text-md font-medium text-gray-900 border-b pb-2">조직정보</h4>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500 mb-1">부서</label>
+                      <p className="text-sm text-gray-900">{profileForm.department || user.department || '미지정'}</p>
                     </div>
-                    {profileForm.workRole && (
-                      <div className="mt-4">
-                        <label className="block text-sm font-medium text-gray-500 mb-1">업무역할</label>
-                        <p className="text-sm text-gray-900 whitespace-pre-wrap">{profileForm.workRole}</p>
-                      </div>
-                    )}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500 mb-1">팀</label>
+                      <p className="text-sm text-gray-900">{profileForm.team || '팀 미지정'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500 mb-1">직급</label>
+                      <p className="text-sm text-gray-900">{profileForm.jobTitle || '직급 미지정'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500 mb-1">포지션</label>
+                      <p className="text-sm text-gray-900">{profileForm.position || '포지션 미지정'}</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-500 mb-1">업무역할</label>
+                      <p className="text-sm text-gray-900 whitespace-pre-wrap">{profileForm.workRole || '미등록'}</p>
+                    </div>
                   </div>
                 </div>
               )}
             </div>
           </div>
 
-
-          {/* 보안 설정 */}
-          <div className="card">
-            <div className="card-header">
-              <h3 className="card-title">보안 설정</h3>
-            </div>
-            <div className="card-body space-y-3">
-              <div className="flex items-center justify-between py-2">
-                <div>
-                  <h4 className="text-sm font-medium text-gray-900">2단계 인증</h4>
-                  <p className="text-xs text-gray-500">계정 보안을 위한 추가 인증</p>
-                </div>
-                <button className="px-3 py-1.5 text-xs font-medium rounded-md text-gray-600 bg-gray-100" disabled>
-                  곧 출시
-                </button>
-              </div>
-              <div className="flex items-center justify-between py-2 border-t pt-3">
-                <div>
-                  <h4 className="text-sm font-medium text-gray-900">로그인 알림</h4>
-                  <p className="text-xs text-gray-500">새 기기 로그인 시 이메일 알림</p>
-                </div>
-                <button className="px-3 py-1.5 text-xs font-medium rounded-md text-gray-600 bg-gray-100" disabled>
-                  곧 출시
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

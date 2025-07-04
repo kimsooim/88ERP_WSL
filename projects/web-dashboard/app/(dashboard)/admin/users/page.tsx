@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useLog } from '../../../contexts/LogContext';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 
 interface User {
   id: string;
@@ -110,6 +111,8 @@ export default function AdminUsersPage() {
     { id: '4', name: '온라인팀', type: 'team', parentId: '1' }
   ]);
   const [users, setUsers] = useState<User[]>(getDefaultUsers());
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -602,6 +605,69 @@ export default function AdminUsersPage() {
     }
   };
 
+  // 정렬 함수
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  // 정렬된 사용자 목록
+  const sortedUsers = [...users].sort((a, b) => {
+    if (!sortField) return 0;
+    
+    // 권한그룹 정렬의 경우 기초등록의 권한그룹관리 순서를 따름
+    if (sortField === 'role') {
+      const getRoleIndex = (role: string) => {
+        const roleIndex = systemRoles.findIndex(r => r.name === role);
+        return roleIndex >= 0 ? roleIndex : 999; // 없으면 맨 뒤로
+      };
+      
+      const aIndex = getRoleIndex(a.role);
+      const bIndex = getRoleIndex(b.role);
+      
+      if (sortDirection === 'asc') {
+        return aIndex - bIndex;
+      } else {
+        return bIndex - aIndex;
+      }
+    }
+    
+    let aValue = a[sortField as keyof User];
+    let bValue = b[sortField as keyof User];
+    
+    if (aValue === undefined || aValue === null) aValue = '';
+    if (bValue === undefined || bValue === null) bValue = '';
+    
+    if (sortDirection === 'asc') {
+      return aValue > bValue ? 1 : -1;
+    } else {
+      return aValue < bValue ? 1 : -1;
+    }
+  });
+
+  // 권한그룹 색상 반환 함수
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case '관리자':
+        return 'bg-yellow-100 text-yellow-800';
+      case '팀장':
+      case '매니저':
+        return 'bg-blue-100 text-blue-800';
+      case '팀원':
+      case '일반사용자':
+        return 'bg-green-100 text-green-800';
+      case '게스트':
+      case '인턴':
+        return 'bg-gray-100 text-gray-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -667,25 +733,88 @@ export default function AdminUsersPage() {
                   프로필
                 </th>
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  닉네임/이름
+                  <button 
+                    onClick={() => handleSort('name')}
+                    className="flex items-center space-x-1 hover:text-gray-700"
+                  >
+                    <span>닉네임/이름</span>
+                    <div className="flex flex-col">
+                      <ChevronUp className={`h-3 w-3 ${sortField === 'name' && sortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                      <ChevronDown className={`h-3 w-3 -mt-1 ${sortField === 'name' && sortDirection === 'desc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                    </div>
+                  </button>
                 </th>
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  이메일/MBTI
+                  <button 
+                    onClick={() => handleSort('email')}
+                    className="flex items-center space-x-1 hover:text-gray-700"
+                  >
+                    <span>이메일/MBTI</span>
+                    <div className="flex flex-col">
+                      <ChevronUp className={`h-3 w-3 ${sortField === 'email' && sortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                      <ChevronDown className={`h-3 w-3 -mt-1 ${sortField === 'email' && sortDirection === 'desc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                    </div>
+                  </button>
                 </th>
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  부서/팀
+                  <button 
+                    onClick={() => handleSort('department')}
+                    className="flex items-center space-x-1 hover:text-gray-700"
+                  >
+                    <span>부서/팀</span>
+                    <div className="flex flex-col">
+                      <ChevronUp className={`h-3 w-3 ${sortField === 'department' && sortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                      <ChevronDown className={`h-3 w-3 -mt-1 ${sortField === 'department' && sortDirection === 'desc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                    </div>
+                  </button>
                 </th>
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  직급/포지션/업무역할
+                  <button 
+                    onClick={() => handleSort('jobTitle')}
+                    className="flex items-center space-x-1 hover:text-gray-700"
+                  >
+                    <span>직급/포지션/업무역할</span>
+                    <div className="flex flex-col">
+                      <ChevronUp className={`h-3 w-3 ${sortField === 'jobTitle' && sortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                      <ChevronDown className={`h-3 w-3 -mt-1 ${sortField === 'jobTitle' && sortDirection === 'desc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                    </div>
+                  </button>
                 </th>
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  권한그룹
+                  <button 
+                    onClick={() => handleSort('role')}
+                    className="flex items-center space-x-1 hover:text-gray-700"
+                  >
+                    <span>권한그룹</span>
+                    <div className="flex flex-col">
+                      <ChevronUp className={`h-3 w-3 ${sortField === 'role' && sortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                      <ChevronDown className={`h-3 w-3 -mt-1 ${sortField === 'role' && sortDirection === 'desc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                    </div>
+                  </button>
                 </th>
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  생년월일
+                  <button 
+                    onClick={() => handleSort('birthDate')}
+                    className="flex items-center space-x-1 hover:text-gray-700"
+                  >
+                    <span>생년월일</span>
+                    <div className="flex flex-col">
+                      <ChevronUp className={`h-3 w-3 ${sortField === 'birthDate' && sortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                      <ChevronDown className={`h-3 w-3 -mt-1 ${sortField === 'birthDate' && sortDirection === 'desc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                    </div>
+                  </button>
                 </th>
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  입사일/근무기간
+                  <button 
+                    onClick={() => handleSort('joinDate')}
+                    className="flex items-center space-x-1 hover:text-gray-700"
+                  >
+                    <span>입사일/근무기간</span>
+                    <div className="flex flex-col">
+                      <ChevronUp className={`h-3 w-3 ${sortField === 'joinDate' && sortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                      <ChevronDown className={`h-3 w-3 -mt-1 ${sortField === 'joinDate' && sortDirection === 'desc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                    </div>
+                  </button>
                 </th>
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   연락처/주소
@@ -699,7 +828,7 @@ export default function AdminUsersPage() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {users.map((user) => (
+              {sortedUsers.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50">
                   <td className="px-3 py-2 whitespace-nowrap">
                     <div className="flex items-center justify-center">
@@ -744,7 +873,7 @@ export default function AdminUsersPage() {
                     </div>
                   </td>
                   <td className="px-3 py-2 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}>
+                    <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full ${getRoleColor(user.role)}`}>
                       {user.role}
                     </span>
                   </td>
@@ -861,64 +990,64 @@ export default function AdminUsersPage() {
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-50">
           <div className="fixed inset-0 z-50 overflow-y-auto">
             <div className="flex min-h-full items-center justify-center p-4">
-              <div className="relative transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+              <div className="relative transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-4xl lg:max-w-5xl">
                 <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                   <h3 className="text-lg font-semibold leading-6 text-gray-900 mb-4">
                     새 사용자 추가
                   </h3>
                   
-                  <div className="space-y-4">
-                    {/* 프로필 이미지 */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        프로필 이미지
-                      </label>
-                      <div className="flex items-center space-x-4">
-                        {formData.profileImage ? (
-                          <img 
-                            src={formData.profileImage} 
-                            alt="프로필 미리보기"
-                            className="h-20 w-20 rounded-full object-cover border-2 border-gray-200"
-                          />
-                        ) : (
-                          <div className="h-20 w-20 rounded-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-gray-500 text-2xl font-medium">
-                              {formData.name ? formData.name.charAt(0).toUpperCase() : '?'}
-                            </span>
-                          </div>
-                        )}
-                        <div>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="hidden"
-                            id="profile-upload-add"
-                          />
-                          <label
-                            htmlFor="profile-upload-add"
-                            className="cursor-pointer inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
-                          >
-                            <svg className="-ml-0.5 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            이미지 선택
-                          </label>
-                          {formData.profileImage && (
-                            <button
-                              type="button"
-                              onClick={() => setFormData({ ...formData, profileImage: '' })}
-                              className="ml-2 text-sm text-red-600 hover:text-red-900"
-                            >
-                              삭제
-                            </button>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* 왼쪽 열: 프로필 및 기본 정보 */}
+                    <div className="space-y-4">
+                      <h4 className="text-md font-medium text-gray-900 border-b pb-2">기본 정보</h4>
+                      
+                      {/* 프로필 이미지 */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          프로필 이미지
+                        </label>
+                        <div className="flex flex-col items-center space-y-2">
+                          {formData.profileImage ? (
+                            <img 
+                              src={formData.profileImage} 
+                              alt="프로필 미리보기"
+                              className="h-16 w-16 rounded-full object-cover border-2 border-gray-200"
+                            />
+                          ) : (
+                            <div className="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center">
+                              <span className="text-gray-500 text-lg font-medium">
+                                {formData.name ? formData.name.charAt(0).toUpperCase() : '?'}
+                              </span>
+                            </div>
                           )}
+                          <div className="flex space-x-2">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleImageChange}
+                              className="hidden"
+                              id="profile-upload-add"
+                            />
+                            <label
+                              htmlFor="profile-upload-add"
+                              className="cursor-pointer inline-flex items-center px-2 py-1 border border-gray-300 shadow-sm text-xs leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                            >
+                              선택
+                            </label>
+                            {formData.profileImage && (
+                              <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, profileImage: '' })}
+                                className="text-xs text-red-600 hover:text-red-900"
+                              >
+                                삭제
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-500 text-center">JPG, PNG (5MB 이하)</p>
                         </div>
                       </div>
-                      <p className="mt-1 text-xs text-gray-500">JPG, PNG 형식의 5MB 이하 이미지</p>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
+                      
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           닉네임 <span className="text-red-500">*</span>
@@ -932,6 +1061,7 @@ export default function AdminUsersPage() {
                           required
                         />
                       </div>
+                      
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           실제 이름
@@ -944,61 +1074,78 @@ export default function AdminUsersPage() {
                           placeholder="실제 이름"
                         />
                       </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          이메일 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          전화번호
+                        </label>
+                        <input
+                          type="tel"
+                          value={formData.phone}
+                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          placeholder="010-0000-0000"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          비밀번호 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.password}
+                          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                          placeholder="비밀번호 입력"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          required
+                        />
+                      </div>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        이메일 <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      />
-                    </div>
+                    {/* 가운데 열: 조직 및 권한 정보 */}
+                    <div className="space-y-4">
+                      <h4 className="text-md font-medium text-gray-900 border-b pb-2">조직 정보</h4>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          권한그룹 <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={formData.role}
+                          onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="">권한그룹 선택</option>
+                          {systemRoles.length > 0 ? (
+                            systemRoles.map(role => (
+                              <option key={role.id} value={role.name}>
+                                {role.name}
+                              </option>
+                            ))
+                          ) : (
+                            <>
+                              <option value="일반사용자">일반사용자</option>
+                              <option value="매니저">매니저</option>
+                              <option value="관리자">관리자</option>
+                            </>
+                          )}
+                        </select>
+                      </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        전화번호
-                      </label>
-                      <input
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        placeholder="010-0000-0000"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        권한그룹 <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        value={formData.role}
-                        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="">권한그룹 선택</option>
-                        {systemRoles.length > 0 ? (
-                          systemRoles.map(role => (
-                            <option key={role.id} value={role.name}>
-                              {role.name} - {role.description}
-                            </option>
-                          ))
-                        ) : (
-                          <>
-                            <option value="일반사용자">일반사용자</option>
-                            <option value="매니저">매니저</option>
-                            <option value="관리자">관리자</option>
-                          </>
-                        )}
-                      </select>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           부서 <span className="text-red-500">*</span>
@@ -1044,9 +1191,7 @@ export default function AdminUsersPage() {
                           )}
                         </select>
                       </div>
-                    </div>
 
-                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           직급
@@ -1072,22 +1217,39 @@ export default function AdminUsersPage() {
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          업무역할
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.workRole}
+                          onChange={(e) => setFormData({ ...formData, workRole: e.target.value })}
+                          placeholder="담당 업무 설명"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          상태
+                        </label>
+                        <select
+                          value={formData.status}
+                          onChange={(e) => setFormData({ ...formData, status: e.target.value as 'active' | 'inactive' })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="active">활성</option>
+                          <option value="inactive">비활성</option>
+                        </select>
+                      </div>
                     </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        업무역할
-                      </label>
-                      <textarea
-                        value={formData.workRole}
-                        onChange={(e) => setFormData({ ...formData, workRole: e.target.value })}
-                        placeholder="담당하는 주요 업무를 입력하세요"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        rows={2}
-                      />
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
+
+                    {/* 오른쪽 열: 개인 정보 및 기타 */}
+                    <div className="space-y-4">
+                      <h4 className="text-md font-medium text-gray-900 border-b pb-2">개인 정보</h4>
+                      
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           생년월일
@@ -1111,22 +1273,7 @@ export default function AdminUsersPage() {
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
-                    </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        주소
-                      </label>
-                      <textarea
-                        value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        placeholder="주소를 입력하세요"
-                        rows={2}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           MBTI
@@ -1167,20 +1314,32 @@ export default function AdminUsersPage() {
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        초기 비밀번호
-                      </label>
-                      <input
-                        type="password"
-                        value={formData.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                        placeholder="비워두면 password123으로 설정됩니다"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      />
-                      <p className="mt-1 text-xs text-gray-500">사용자가 첫 로그인 시 변경할 수 있습니다</p>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          퇴사사유
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.resignReason}
+                          onChange={(e) => setFormData({ ...formData, resignReason: e.target.value })}
+                          placeholder="퇴사사유 입력"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          주소
+                        </label>
+                        <textarea
+                          value={formData.address}
+                          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                          placeholder="주소를 입력하세요"
+                          rows={3}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1188,7 +1347,7 @@ export default function AdminUsersPage() {
                   <button
                     type="button"
                     onClick={handleAddUser}
-                    disabled={!formData.name || !formData.email || !formData.department}
+                    disabled={!formData.name || !formData.email || !formData.password}
                     className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto disabled:bg-gray-300"
                   >
                     추가
@@ -1215,64 +1374,64 @@ export default function AdminUsersPage() {
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity z-50">
           <div className="fixed inset-0 z-50 overflow-y-auto">
             <div className="flex min-h-full items-center justify-center p-4">
-              <div className="relative transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+              <div className="relative transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-4xl lg:max-w-5xl">
                 <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                   <h3 className="text-lg font-semibold leading-6 text-gray-900 mb-4">
                     사용자 정보 수정
                   </h3>
                   
-                  <div className="space-y-4">
-                    {/* 프로필 이미지 */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        프로필 이미지
-                      </label>
-                      <div className="flex items-center space-x-4">
-                        {formData.profileImage ? (
-                          <img 
-                            src={formData.profileImage} 
-                            alt="프로필 미리보기"
-                            className="h-20 w-20 rounded-full object-cover border-2 border-gray-200"
-                          />
-                        ) : (
-                          <div className="h-20 w-20 rounded-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-gray-500 text-2xl font-medium">
-                              {formData.name ? formData.name.charAt(0).toUpperCase() : '?'}
-                            </span>
-                          </div>
-                        )}
-                        <div>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="hidden"
-                            id="profile-upload-edit"
-                          />
-                          <label
-                            htmlFor="profile-upload-edit"
-                            className="cursor-pointer inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
-                          >
-                            <svg className="-ml-0.5 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            이미지 변경
-                          </label>
-                          {formData.profileImage && (
-                            <button
-                              type="button"
-                              onClick={() => setFormData({ ...formData, profileImage: '' })}
-                              className="ml-2 text-sm text-red-600 hover:text-red-900"
-                            >
-                              삭제
-                            </button>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* 왼쪽 열: 프로필 및 기본 정보 */}
+                    <div className="space-y-4">
+                      <h4 className="text-md font-medium text-gray-900 border-b pb-2">기본 정보</h4>
+                      
+                      {/* 프로필 이미지 */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          프로필 이미지
+                        </label>
+                        <div className="flex flex-col items-center space-y-2">
+                          {formData.profileImage ? (
+                            <img 
+                              src={formData.profileImage} 
+                              alt="프로필 미리보기"
+                              className="h-16 w-16 rounded-full object-cover border-2 border-gray-200"
+                            />
+                          ) : (
+                            <div className="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center">
+                              <span className="text-gray-500 text-lg font-medium">
+                                {formData.name ? formData.name.charAt(0).toUpperCase() : '?'}
+                              </span>
+                            </div>
                           )}
+                          <div className="flex space-x-2">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleImageChange}
+                              className="hidden"
+                              id="profile-upload-edit"
+                            />
+                            <label
+                              htmlFor="profile-upload-edit"
+                              className="cursor-pointer inline-flex items-center px-2 py-1 border border-gray-300 shadow-sm text-xs leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                            >
+                              변경
+                            </label>
+                            {formData.profileImage && (
+                              <button
+                                type="button"
+                                onClick={() => setFormData({ ...formData, profileImage: '' })}
+                                className="text-xs text-red-600 hover:text-red-900"
+                              >
+                                삭제
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-500 text-center">JPG, PNG (5MB 이하)</p>
                         </div>
                       </div>
-                      <p className="mt-1 text-xs text-gray-500">JPG, PNG 형식의 5MB 이하 이미지</p>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
+                      
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           닉네임 <span className="text-red-500">*</span>
@@ -1286,6 +1445,7 @@ export default function AdminUsersPage() {
                           required
                         />
                       </div>
+                      
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           실제 이름
@@ -1298,61 +1458,77 @@ export default function AdminUsersPage() {
                           placeholder="실제 이름"
                         />
                       </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          이메일 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          전화번호
+                        </label>
+                        <input
+                          type="tel"
+                          value={formData.phone}
+                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          placeholder="010-0000-0000"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          비밀번호
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.password}
+                          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                          placeholder="비밀번호 입력"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        이메일 <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      />
-                    </div>
+                    {/* 가운데 열: 조직 및 권한 정보 */}
+                    <div className="space-y-4">
+                      <h4 className="text-md font-medium text-gray-900 border-b pb-2">조직 정보</h4>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          권한그룹 <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={formData.role}
+                          onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="">권한그룹 선택</option>
+                          {systemRoles.length > 0 ? (
+                            systemRoles.map(role => (
+                              <option key={role.id} value={role.name}>
+                                {role.name}
+                              </option>
+                            ))
+                          ) : (
+                            <>
+                              <option value="일반사용자">일반사용자</option>
+                              <option value="매니저">매니저</option>
+                              <option value="관리자">관리자</option>
+                            </>
+                          )}
+                        </select>
+                      </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        전화번호
-                      </label>
-                      <input
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        placeholder="010-0000-0000"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        권한그룹 <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        value={formData.role}
-                        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="">권한그룹 선택</option>
-                        {systemRoles.length > 0 ? (
-                          systemRoles.map(role => (
-                            <option key={role.id} value={role.name}>
-                              {role.name} - {role.description}
-                            </option>
-                          ))
-                        ) : (
-                          <>
-                            <option value="일반사용자">일반사용자</option>
-                            <option value="매니저">매니저</option>
-                            <option value="관리자">관리자</option>
-                          </>
-                        )}
-                      </select>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           부서 <span className="text-red-500">*</span>
@@ -1398,9 +1574,7 @@ export default function AdminUsersPage() {
                           )}
                         </select>
                       </div>
-                    </div>
 
-                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           직급
@@ -1426,23 +1600,39 @@ export default function AdminUsersPage() {
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          업무역할
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.workRole}
+                          onChange={(e) => setFormData({ ...formData, workRole: e.target.value })}
+                          placeholder="담당 업무 설명"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          상태
+                        </label>
+                        <select
+                          value={formData.status}
+                          onChange={(e) => setFormData({ ...formData, status: e.target.value as 'active' | 'inactive' })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="active">활성</option>
+                          <option value="inactive">비활성</option>
+                        </select>
+                      </div>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        상태
-                      </label>
-                      <select
-                        value={formData.status}
-                        onChange={(e) => setFormData({ ...formData, status: e.target.value as 'active' | 'inactive' })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="active">활성</option>
-                        <option value="inactive">비활성</option>
-                      </select>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
+                    {/* 오른쪽 열: 개인 정보 및 기타 */}
+                    <div className="space-y-4">
+                      <h4 className="text-md font-medium text-gray-900 border-b pb-2">개인 정보</h4>
+                      
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           생년월일
@@ -1466,22 +1656,7 @@ export default function AdminUsersPage() {
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
-                    </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        주소
-                      </label>
-                      <textarea
-                        value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                        placeholder="주소를 입력하세요"
-                        rows={2}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           MBTI
@@ -1522,6 +1697,32 @@ export default function AdminUsersPage() {
                           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          퇴사사유
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.resignReason}
+                          onChange={(e) => setFormData({ ...formData, resignReason: e.target.value })}
+                          placeholder="퇴사사유 입력"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          주소
+                        </label>
+                        <textarea
+                          value={formData.address}
+                          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                          placeholder="주소를 입력하세요"
+                          rows={3}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1529,7 +1730,7 @@ export default function AdminUsersPage() {
                   <button
                     type="button"
                     onClick={handleEditUser}
-                    disabled={!formData.name || !formData.email || !formData.department}
+                    disabled={!formData.name || !formData.email || !formData.password}
                     className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto disabled:bg-gray-300"
                   >
                     저장
