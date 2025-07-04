@@ -111,8 +111,18 @@ export default function AdminUsersPage() {
     { id: '4', name: '온라인팀', type: 'team', parentId: '1' }
   ]);
   const [users, setUsers] = useState<User[]>(getDefaultUsers());
-  const [sortField, setSortField] = useState<string | null>(null);
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [sortField, setSortField] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('userListSortField') || null;
+    }
+    return null;
+  });
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('userListSortDirection') as 'asc' | 'desc') || 'asc';
+    }
+    return 'asc';
+  });
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -607,12 +617,20 @@ export default function AdminUsersPage() {
 
   // 정렬 함수
   const handleSort = (field: string) => {
+    let newDirection: 'asc' | 'desc' = 'asc';
+    
     if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+      newDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+      setSortDirection(newDirection);
     } else {
       setSortField(field);
       setSortDirection('asc');
+      newDirection = 'asc';
     }
+    
+    // localStorage에 정렬 상태 저장
+    localStorage.setItem('userListSortField', field);
+    localStorage.setItem('userListSortDirection', newDirection);
   };
 
   // 정렬된 사용자 목록
@@ -690,31 +708,33 @@ export default function AdminUsersPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="card">
           <div className="card-body">
-            <p className="text-sm text-gray-600">전체 사용자</p>
-            <p className="text-2xl font-bold text-gray-900">{users.length}명</p>
-          </div>
-        </div>
-        <div className="card">
-          <div className="card-body">
-            <p className="text-sm text-gray-600">활성 사용자</p>
-            <p className="text-2xl font-bold text-green-600">
-              {users.filter(u => u.status === 'active').length}명
-            </p>
-          </div>
-        </div>
-        <div className="card">
-          <div className="card-body">
-            <p className="text-sm text-gray-600">관리자</p>
-            <p className="text-2xl font-bold text-red-600">
-              {users.filter(u => u.role === '관리자').length}명
-            </p>
-          </div>
-        </div>
-        <div className="card">
-          <div className="card-body">
-            <p className="text-sm text-gray-600">부서</p>
+            <p className="text-sm text-gray-600">미래전략부</p>
             <p className="text-2xl font-bold text-blue-600">
-              {new Set(users.map(u => u.department)).size}개
+              {users.filter(u => u.department === '미래전략부').length}명
+            </p>
+          </div>
+        </div>
+        <div className="card">
+          <div className="card-body">
+            <p className="text-sm text-gray-600">토이사업부</p>
+            <p className="text-2xl font-bold text-blue-600">
+              {users.filter(u => u.department === '토이사업부').length}명
+            </p>
+          </div>
+        </div>
+        <div className="card">
+          <div className="card-body">
+            <p className="text-sm text-gray-600">브랜드사업부</p>
+            <p className="text-2xl font-bold text-blue-600">
+              {users.filter(u => u.department === '브랜드사업부').length}명
+            </p>
+          </div>
+        </div>
+        <div className="card">
+          <div className="card-body">
+            <p className="text-sm text-gray-600">게스트</p>
+            <p className="text-2xl font-bold text-blue-600">
+              {users.filter(u => u.role === '게스트').length}명
             </p>
           </div>
         </div>
@@ -727,8 +747,8 @@ export default function AdminUsersPage() {
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
+            <thead>
+              <tr className="bg-gray-50">
                 <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   프로필
                 </th>
@@ -992,18 +1012,18 @@ export default function AdminUsersPage() {
             <div className="flex min-h-full items-center justify-center p-4">
               <div className="relative transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-4xl lg:max-w-5xl">
                 <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                  <h3 className="text-lg font-semibold leading-6 text-gray-900 mb-4">
+                  <h3 className="text-sm font-semibold leading-6 text-gray-900 mb-4">
                     새 사용자 추가
                   </h3>
                   
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* 왼쪽 열: 프로필 및 기본 정보 */}
-                    <div className="space-y-4">
-                      <h4 className="text-md font-medium text-gray-900 border-b pb-2">기본 정보</h4>
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-gray-900 border-b pb-1">기본 정보</h4>
                       
                       {/* 프로필 이미지 */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           프로필 이미지
                         </label>
                         <div className="flex flex-col items-center space-y-2">
@@ -1011,11 +1031,11 @@ export default function AdminUsersPage() {
                             <img 
                               src={formData.profileImage} 
                               alt="프로필 미리보기"
-                              className="h-16 w-16 rounded-full object-cover border-2 border-gray-200"
+                              className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
                             />
                           ) : (
-                            <div className="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center">
-                              <span className="text-gray-500 text-lg font-medium">
+                            <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
+                              <span className="text-gray-500 text-sm font-medium">
                                 {formData.name ? formData.name.charAt(0).toUpperCase() : '?'}
                               </span>
                             </div>
@@ -1049,47 +1069,47 @@ export default function AdminUsersPage() {
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           닉네임 <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
                           value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                           placeholder="표시될 이름"
                           required
                         />
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           실제 이름
                         </label>
                         <input
                           type="text"
                           value={formData.realName}
                           onChange={(e) => setFormData({ ...formData, realName: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                           placeholder="실제 이름"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           이메일 <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="email"
                           value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                           required
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           전화번호
                         </label>
                         <input
@@ -1097,37 +1117,24 @@ export default function AdminUsersPage() {
                           value={formData.phone}
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                           placeholder="010-0000-0000"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          비밀번호 <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.password}
-                          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                          placeholder="비밀번호 입력"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                          required
-                        />
-                      </div>
                     </div>
 
                     {/* 가운데 열: 조직 및 권한 정보 */}
-                    <div className="space-y-4">
-                      <h4 className="text-md font-medium text-gray-900 border-b pb-2">조직 정보</h4>
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-gray-900 border-b pb-1">조직 정보</h4>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           권한그룹 <span className="text-red-500">*</span>
                         </label>
                         <select
                           value={formData.role}
                           onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         >
                           <option value="">권한그룹 선택</option>
                           {systemRoles.length > 0 ? (
@@ -1147,13 +1154,13 @@ export default function AdminUsersPage() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           부서 <span className="text-red-500">*</span>
                         </label>
                         <select
                           value={formData.department}
                           onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                           required
                         >
                           <option value="">부서 선택</option>
@@ -1168,13 +1175,13 @@ export default function AdminUsersPage() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           팀
                         </label>
                         <select
                           value={formData.team}
                           onChange={(e) => setFormData({ ...formData, team: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         >
                           <option value="">팀 선택</option>
                           {formData.department ? (
@@ -1193,7 +1200,7 @@ export default function AdminUsersPage() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           직급
                         </label>
                         <input
@@ -1201,12 +1208,12 @@ export default function AdminUsersPage() {
                           value={formData.jobTitle}
                           onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
                           placeholder="예: 대리, 과장"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           포지션
                         </label>
                         <input
@@ -1214,12 +1221,12 @@ export default function AdminUsersPage() {
                           value={formData.position}
                           onChange={(e) => setFormData({ ...formData, position: e.target.value })}
                           placeholder="예: PM, Designer"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           업무역할
                         </label>
                         <input
@@ -1227,18 +1234,18 @@ export default function AdminUsersPage() {
                           value={formData.workRole}
                           onChange={(e) => setFormData({ ...formData, workRole: e.target.value })}
                           placeholder="담당 업무 설명"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           상태
                         </label>
                         <select
                           value={formData.status}
                           onChange={(e) => setFormData({ ...formData, status: e.target.value as 'active' | 'inactive' })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         >
                           <option value="active">활성</option>
                           <option value="inactive">비활성</option>
@@ -1247,41 +1254,41 @@ export default function AdminUsersPage() {
                     </div>
 
                     {/* 오른쪽 열: 개인 정보 및 기타 */}
-                    <div className="space-y-4">
-                      <h4 className="text-md font-medium text-gray-900 border-b pb-2">개인 정보</h4>
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-gray-900 border-b pb-1">개인 정보</h4>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           생년월일
                         </label>
                         <input
                           type="date"
                           value={formData.birthDate}
                           onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           입사일
                         </label>
                         <input
                           type="date"
                           value={formData.joinDate}
                           onChange={(e) => setFormData({ ...formData, joinDate: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           MBTI
                         </label>
                         <select
                           value={formData.mbti}
                           onChange={(e) => setFormData({ ...formData, mbti: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         >
                           <option value="">선택하세요</option>
                           <option value="INTJ">INTJ</option>
@@ -1304,19 +1311,19 @@ export default function AdminUsersPage() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           퇴사일
                         </label>
                         <input
                           type="date"
                           value={formData.resignDate}
                           onChange={(e) => setFormData({ ...formData, resignDate: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           퇴사사유
                         </label>
                         <input
@@ -1324,12 +1331,12 @@ export default function AdminUsersPage() {
                           value={formData.resignReason}
                           onChange={(e) => setFormData({ ...formData, resignReason: e.target.value })}
                           placeholder="퇴사사유 입력"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           주소
                         </label>
                         <textarea
@@ -1337,7 +1344,7 @@ export default function AdminUsersPage() {
                           onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                           placeholder="주소를 입력하세요"
                           rows={3}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
                     </div>
@@ -1347,8 +1354,8 @@ export default function AdminUsersPage() {
                   <button
                     type="button"
                     onClick={handleAddUser}
-                    disabled={!formData.name || !formData.email || !formData.password}
-                    className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto disabled:bg-gray-300"
+                    disabled={!formData.name || !formData.email}
+                    className="inline-flex w-full justify-center rounded-md bg-blue-600 px-2 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto disabled:bg-gray-300"
                   >
                     추가
                   </button>
@@ -1358,7 +1365,7 @@ export default function AdminUsersPage() {
                       setShowAddModal(false);
                       resetForm();
                     }}
-                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-2 py-1.5 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
                   >
                     취소
                   </button>
@@ -1376,18 +1383,18 @@ export default function AdminUsersPage() {
             <div className="flex min-h-full items-center justify-center p-4">
               <div className="relative transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-4xl lg:max-w-5xl">
                 <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                  <h3 className="text-lg font-semibold leading-6 text-gray-900 mb-4">
+                  <h3 className="text-sm font-semibold leading-6 text-gray-900 mb-4">
                     사용자 정보 수정
                   </h3>
                   
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* 왼쪽 열: 프로필 및 기본 정보 */}
-                    <div className="space-y-4">
-                      <h4 className="text-md font-medium text-gray-900 border-b pb-2">기본 정보</h4>
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-gray-900 border-b pb-1">기본 정보</h4>
                       
                       {/* 프로필 이미지 */}
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           프로필 이미지
                         </label>
                         <div className="flex flex-col items-center space-y-2">
@@ -1395,11 +1402,11 @@ export default function AdminUsersPage() {
                             <img 
                               src={formData.profileImage} 
                               alt="프로필 미리보기"
-                              className="h-16 w-16 rounded-full object-cover border-2 border-gray-200"
+                              className="h-12 w-12 rounded-full object-cover border-2 border-gray-200"
                             />
                           ) : (
-                            <div className="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center">
-                              <span className="text-gray-500 text-lg font-medium">
+                            <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center">
+                              <span className="text-gray-500 text-sm font-medium">
                                 {formData.name ? formData.name.charAt(0).toUpperCase() : '?'}
                               </span>
                             </div>
@@ -1433,47 +1440,47 @@ export default function AdminUsersPage() {
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           닉네임 <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
                           value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                           placeholder="표시될 이름"
                           required
                         />
                       </div>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           실제 이름
                         </label>
                         <input
                           type="text"
                           value={formData.realName}
                           onChange={(e) => setFormData({ ...formData, realName: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                           placeholder="실제 이름"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           이메일 <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="email"
                           value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                           required
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           전화번호
                         </label>
                         <input
@@ -1481,36 +1488,24 @@ export default function AdminUsersPage() {
                           value={formData.phone}
                           onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                           placeholder="010-0000-0000"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
 
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          비밀번호
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.password}
-                          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                          placeholder="비밀번호 입력"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      </div>
                     </div>
 
                     {/* 가운데 열: 조직 및 권한 정보 */}
-                    <div className="space-y-4">
-                      <h4 className="text-md font-medium text-gray-900 border-b pb-2">조직 정보</h4>
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-gray-900 border-b pb-1">조직 정보</h4>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           권한그룹 <span className="text-red-500">*</span>
                         </label>
                         <select
                           value={formData.role}
                           onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         >
                           <option value="">권한그룹 선택</option>
                           {systemRoles.length > 0 ? (
@@ -1530,13 +1525,13 @@ export default function AdminUsersPage() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           부서 <span className="text-red-500">*</span>
                         </label>
                         <select
                           value={formData.department}
                           onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                           required
                         >
                           <option value="">부서 선택</option>
@@ -1551,13 +1546,13 @@ export default function AdminUsersPage() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           팀
                         </label>
                         <select
                           value={formData.team}
                           onChange={(e) => setFormData({ ...formData, team: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         >
                           <option value="">팀 선택</option>
                           {formData.department ? (
@@ -1576,7 +1571,7 @@ export default function AdminUsersPage() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           직급
                         </label>
                         <input
@@ -1584,12 +1579,12 @@ export default function AdminUsersPage() {
                           value={formData.jobTitle}
                           onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
                           placeholder="예: 대리, 과장"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           포지션
                         </label>
                         <input
@@ -1597,12 +1592,12 @@ export default function AdminUsersPage() {
                           value={formData.position}
                           onChange={(e) => setFormData({ ...formData, position: e.target.value })}
                           placeholder="예: PM, Designer"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           업무역할
                         </label>
                         <input
@@ -1610,18 +1605,18 @@ export default function AdminUsersPage() {
                           value={formData.workRole}
                           onChange={(e) => setFormData({ ...formData, workRole: e.target.value })}
                           placeholder="담당 업무 설명"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           상태
                         </label>
                         <select
                           value={formData.status}
                           onChange={(e) => setFormData({ ...formData, status: e.target.value as 'active' | 'inactive' })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         >
                           <option value="active">활성</option>
                           <option value="inactive">비활성</option>
@@ -1630,41 +1625,41 @@ export default function AdminUsersPage() {
                     </div>
 
                     {/* 오른쪽 열: 개인 정보 및 기타 */}
-                    <div className="space-y-4">
-                      <h4 className="text-md font-medium text-gray-900 border-b pb-2">개인 정보</h4>
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-gray-900 border-b pb-1">개인 정보</h4>
                       
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           생년월일
                         </label>
                         <input
                           type="date"
                           value={formData.birthDate}
                           onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           입사일
                         </label>
                         <input
                           type="date"
                           value={formData.joinDate}
                           onChange={(e) => setFormData({ ...formData, joinDate: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           MBTI
                         </label>
                         <select
                           value={formData.mbti}
                           onChange={(e) => setFormData({ ...formData, mbti: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         >
                           <option value="">선택하세요</option>
                           <option value="INTJ">INTJ</option>
@@ -1687,19 +1682,19 @@ export default function AdminUsersPage() {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           퇴사일
                         </label>
                         <input
                           type="date"
                           value={formData.resignDate}
                           onChange={(e) => setFormData({ ...formData, resignDate: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           퇴사사유
                         </label>
                         <input
@@ -1707,12 +1702,12 @@ export default function AdminUsersPage() {
                           value={formData.resignReason}
                           onChange={(e) => setFormData({ ...formData, resignReason: e.target.value })}
                           placeholder="퇴사사유 입력"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">
                           주소
                         </label>
                         <textarea
@@ -1720,7 +1715,7 @@ export default function AdminUsersPage() {
                           onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                           placeholder="주소를 입력하세요"
                           rows={3}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
                     </div>
@@ -1730,8 +1725,8 @@ export default function AdminUsersPage() {
                   <button
                     type="button"
                     onClick={handleEditUser}
-                    disabled={!formData.name || !formData.email || !formData.password}
-                    className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto disabled:bg-gray-300"
+                    disabled={!formData.name || !formData.email}
+                    className="inline-flex w-full justify-center rounded-md bg-blue-600 px-2 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto disabled:bg-gray-300"
                   >
                     저장
                   </button>
@@ -1742,7 +1737,7 @@ export default function AdminUsersPage() {
                       setEditingUser(null);
                       resetForm();
                     }}
-                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-2 py-1.5 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
                   >
                     취소
                   </button>

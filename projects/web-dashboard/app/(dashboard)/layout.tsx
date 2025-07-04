@@ -75,7 +75,7 @@ const menuItems: { [key: string]: MenuItem[] } = {
   admin: [
     { name: '기초등록', href: '/admin/system', icon: <FiSettings className="w-4 h-4" /> },
     { name: '사용자관리', href: '/admin/users', icon: <FiUsers className="w-4 h-4" /> },
-    { name: '페이지설정', href: '/admin/pages', icon: <FiFileText className="w-4 h-4" /> },
+    { name: '로그인설정', href: '/admin/pages', icon: <FiFileText className="w-4 h-4" /> },
     { name: '로그관리', href: '/admin/logs', icon: <FiActivity className="w-4 h-4" /> },
     { name: '서버관리', href: '/admin/servers', icon: <FiTrendingUp className="w-4 h-4" /> }
   ]
@@ -144,8 +144,8 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 페이히어 스타일 상단 헤더 - 블루 배경 */}
-      <header className="bg-blue-600 text-white shadow-lg">
+      {/* 페이히어 스타일 상단 헤더 - 블루 배경 (고정) */}
+      <header className="bg-blue-600 text-white shadow-lg sticky top-0 z-50">
         <div className="px-6 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-8">

@@ -1,344 +1,556 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Shield, Eye, EyeOff, Save, ChevronRight, ChevronDown } from 'lucide-react';
+import { Key, Clock, Users, Edit2, Save, X, ChevronUp, ChevronDown } from 'lucide-react';
 
-interface Role {
+interface User {
   id: string;
   name: string;
-  permissions: string[];
-  description: string;
+  realName?: string;
+  email: string;
+  userId?: string; // 로그인용 아이디
+  password?: string;
+  profileImage?: string;
+  lastLogin?: string;
+  lastModified?: string; // 마지막 수정일
+  status: 'active' | 'inactive';
+  role: string;
+  department: string;
+  team?: string;
 }
 
-interface PagePermission {
-  path: string;
-  name: string;
-  category: string;
-  allowedRoles: string[];
-  children?: PagePermission[];
-}
-
-const defaultPages: PagePermission[] = [
-  {
-    path: '/online',
-    name: '온라인사업',
-    category: 'online',
-    allowedRoles: [],
-    children: [
-      { path: '/online', name: '대시보드', category: 'online', allowedRoles: [] },
-      { path: '/online/products', name: '제품관리', category: 'online', allowedRoles: [] },
-      { path: '/online/orders', name: '주문관리', category: 'online', allowedRoles: [] },
-      { path: '/online/channels', name: '채널관리', category: 'online', allowedRoles: [] },
-      { path: '/online/customers', name: '고객관리', category: 'online', allowedRoles: [] },
-      { path: '/online/purchases', name: '구매관리', category: 'online', allowedRoles: [] },
-      { path: '/online/advertising', name: '광고관리', category: 'online', allowedRoles: [] },
-      { path: '/online/sales', name: '매출관리', category: 'online', allowedRoles: [] },
-      { path: '/online/automation', name: '자동화', category: 'online', allowedRoles: [] }
-    ]
-  },
-  {
-    path: '/offline',
-    name: '오프라인사업',
-    category: 'offline',
-    allowedRoles: [],
-    children: [
-      { path: '/offline', name: '대시보드', category: 'offline', allowedRoles: [] },
-      { path: '/offline/products', name: '제품관리', category: 'offline', allowedRoles: [] },
-      { path: '/offline/orders', name: '주문관리', category: 'offline', allowedRoles: [] },
-      { path: '/offline/channels', name: '채널관리', category: 'offline', allowedRoles: [] },
-      { path: '/offline/customers', name: '고객관리', category: 'offline', allowedRoles: [] },
-      { path: '/offline/purchases', name: '구매관리', category: 'offline', allowedRoles: [] },
-      { path: '/offline/sales', name: '매출관리', category: 'offline', allowedRoles: [] },
-      { path: '/offline/automation', name: '자동화', category: 'offline', allowedRoles: [] }
-    ]
-  },
-  {
-    path: '/toy',
-    name: '토이사업',
-    category: 'toy',
-    allowedRoles: [],
-    children: [
-      { path: '/toy', name: '대시보드', category: 'toy', allowedRoles: [] },
-      { path: '/toy/products', name: '제품관리', category: 'toy', allowedRoles: [] },
-      { path: '/toy/customers', name: '고객관리', category: 'toy', allowedRoles: [] },
-      { path: '/toy/quotes', name: '견적관리', category: 'toy', allowedRoles: [] },
-      { path: '/toy/samples', name: '샘플관리', category: 'toy', allowedRoles: [] },
-      { path: '/toy/production', name: '생산관리', category: 'toy', allowedRoles: [] },
-      { path: '/toy/advertising', name: '광고관리', category: 'toy', allowedRoles: [] },
-      { path: '/toy/sales', name: '매출관리', category: 'toy', allowedRoles: [] },
-      { path: '/toy/automation', name: '자동화', category: 'toy', allowedRoles: [] }
-    ]
-  },
-  {
-    path: '/purchase-report',
-    name: '구매보고서',
-    category: 'purchase-report',
-    allowedRoles: [],
-    children: [
-      { path: '/purchase-report/total-inventory', name: '전체재고', category: 'purchase-report', allowedRoles: [] },
-      { path: '/purchase-report/period-inventory', name: '기간별재고', category: 'purchase-report', allowedRoles: [] },
-      { path: '/purchase-report/business-inventory', name: '사업부별재고', category: 'purchase-report', allowedRoles: [] },
-      { path: '/purchase-report/item-inventory', name: '품목별재고', category: 'purchase-report', allowedRoles: [] },
-      { path: '/purchase-report/import-status', name: '수입현황', category: 'purchase-report', allowedRoles: [] }
-    ]
-  },
-  {
-    path: '/sales-report',
-    name: '매출보고서',
-    category: 'sales-report',
-    allowedRoles: [],
-    children: [
-      { path: '/sales-report/period-analysis', name: '기간별분석', category: 'sales-report', allowedRoles: [] },
-      { path: '/sales-report/business-analysis', name: '사업별분석', category: 'sales-report', allowedRoles: [] },
-      { path: '/sales-report/manager-analysis', name: '담당자별분석', category: 'sales-report', allowedRoles: [] },
-      { path: '/sales-report/automation', name: '자동화', category: 'sales-report', allowedRoles: [] }
-    ]
-  },
-  {
-    path: '/profit-report',
-    name: '손익보고서',
-    category: 'profit-report',
-    allowedRoles: [],
-    children: [
-      { path: '/profit-report/cost-management', name: '원가관리', category: 'profit-report', allowedRoles: [] },
-      { path: '/profit-report/card-management', name: '카드관리', category: 'profit-report', allowedRoles: [] },
-      { path: '/profit-report/account-management', name: '계좌관리', category: 'profit-report', allowedRoles: [] },
-      { path: '/profit-report/profit-management', name: '손익관리', category: 'profit-report', allowedRoles: [] },
-      { path: '/profit-report/automation', name: '자동화', category: 'profit-report', allowedRoles: [] }
-    ]
-  },
-  {
-    path: '/mypage',
-    name: '마이페이지',
-    category: 'mypage',
-    allowedRoles: [],
-    children: [
-      { path: '/mypage/account', name: '계정관리', category: 'mypage', allowedRoles: [] },
-      { path: '/mypage/tasks', name: '업무관리', category: 'mypage', allowedRoles: [] },
-      { path: '/mypage/contracts', name: '계약관리', category: 'mypage', allowedRoles: [] },
-      { path: '/mypage/vacation', name: '휴가관리', category: 'mypage', allowedRoles: [] },
-      { path: '/mypage/automation', name: '자동화', category: 'mypage', allowedRoles: [] }
-    ]
-  },
-  {
-    path: '/admin',
-    name: '관리자',
-    category: 'admin',
-    allowedRoles: [],
-    children: [
-      { path: '/admin/system', name: '기초등록', category: 'admin', allowedRoles: [] },
-      { path: '/admin/users', name: '사용자관리', category: 'admin', allowedRoles: [] },
-      { path: '/admin/pages', name: '페이지설정', category: 'admin', allowedRoles: [] },
-      { path: '/admin/logs', name: '로그관리', category: 'admin', allowedRoles: [] },
-      { path: '/admin/servers', name: '서버관리', category: 'admin', allowedRoles: [] }
-    ]
-  }
-];
-
-export default function AdminPagesPage() {
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [pagePermissions, setPagePermissions] = useState<PagePermission[]>(defaultPages);
-  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
-
-  // localStorage에서 데이터 불러오기
-  useEffect(() => {
-    try {
-      // 역할 정보 불러오기
-      const savedRoles = localStorage.getItem('88erp_roles');
-      if (savedRoles) {
-        setRoles(JSON.parse(savedRoles));
-      }
-
-      // 페이지 권한 정보 불러오기
-      const savedPermissions = localStorage.getItem('88erp_page_permissions');
-      if (savedPermissions) {
-        setPagePermissions(JSON.parse(savedPermissions));
-      } else {
-        // 기본값 설정 - 관리자는 모든 페이지 접근 가능
-        const adminDefaultPages = defaultPages.map(category => ({
-          ...category,
-          allowedRoles: ['1'], // 관리자 역할 ID
-          children: category.children?.map(page => ({
-            ...page,
-            allowedRoles: ['1']
-          }))
-        }));
-        setPagePermissions(adminDefaultPages);
-      }
-    } catch (error) {
-      console.error('Error loading data from localStorage:', error);
-      // 에러 발생시 기본값 설정
-      setPagePermissions(defaultPages);
+export default function AdminLoginSettingsPage() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [editingUser, setEditingUser] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<{ password: string; userId: string; name: string }>({ password: '', userId: '', name: '' });
+  const [sortField, setSortField] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('loginSettingsSortField') || null;
     }
+    return null;
+  });
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('loginSettingsSortDirection') as 'asc' | 'desc') || 'asc';
+    }
+    return 'asc';
+  });
+  const [loginSortField, setLoginSortField] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('recentLoginSortField') || null;
+    }
+    return null;
+  });
+  const [loginSortDirection, setLoginSortDirection] = useState<'asc' | 'desc'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('recentLoginSortDirection') as 'asc' | 'desc') || 'asc';
+    }
+    return 'asc';
+  });
+
+  // 정렬 처리 함수
+  const handleSort = (field: string) => {
+    let newDirection: 'asc' | 'desc' = 'asc';
+    
+    if (sortField === field) {
+      newDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+      setSortDirection(newDirection);
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+      newDirection = 'asc';
+    }
+    
+    // localStorage에 정렬 상태 저장
+    localStorage.setItem('loginSettingsSortField', field);
+    localStorage.setItem('loginSettingsSortDirection', newDirection);
+  };
+
+  // 최근 로그인 현황 정렬 처리 함수
+  const handleLoginSort = (field: string) => {
+    let newDirection: 'asc' | 'desc' = 'asc';
+    
+    if (loginSortField === field) {
+      newDirection = loginSortDirection === 'asc' ? 'desc' : 'asc';
+      setLoginSortDirection(newDirection);
+    } else {
+      setLoginSortField(field);
+      setLoginSortDirection('asc');
+      newDirection = 'asc';
+    }
+    
+    // localStorage에 정렬 상태 저장
+    localStorage.setItem('recentLoginSortField', field);
+    localStorage.setItem('recentLoginSortDirection', newDirection);
+  };
+
+  // 정렬된 사용자 목록
+  const sortedUsers = [...users].sort((a, b) => {
+    if (!sortField) return 0;
+    
+    let aValue: any = a[sortField as keyof User];
+    let bValue: any = b[sortField as keyof User];
+    
+    // 특별한 정렬 처리
+    if (sortField === 'profile') {
+      aValue = a.name || '';
+      bValue = b.name || '';
+    } else if (sortField === 'userId') {
+      aValue = a.userId || a.email.split('@')[0];
+      bValue = b.userId || b.email.split('@')[0];
+    } else if (sortField === 'role') {
+      // 권한그룹 정렬 - 기초등록 순서대로
+      const roleOrder = ['관리자', '팀장', '매니저', '팀원', '직원', '일반사용자', '게스트', '인턴'];
+      const aIndex = roleOrder.indexOf(aValue);
+      const bIndex = roleOrder.indexOf(bValue);
+      
+      // 목록에 없는 역할은 맨 뒤로
+      const aOrder = aIndex === -1 ? roleOrder.length : aIndex;
+      const bOrder = bIndex === -1 ? roleOrder.length : bIndex;
+      
+      return sortDirection === 'asc' ? aOrder - bOrder : bOrder - aOrder;
+    }
+    
+    // null/undefined 처리
+    if (aValue == null) aValue = '';
+    if (bValue == null) bValue = '';
+    
+    // 문자열 비교
+    const comparison = aValue.toString().localeCompare(bValue.toString(), 'ko');
+    return sortDirection === 'asc' ? comparison : -comparison;
+  });
+
+  // localStorage에서 사용자 데이터 불러오기
+  useEffect(() => {
+    const loadUsers = () => {
+      try {
+        const savedUsers = localStorage.getItem('users');
+        if (savedUsers) {
+          const parsedUsers = JSON.parse(savedUsers);
+          setUsers(parsedUsers);
+        } else {
+          // 기본 사용자 데이터 설정
+          const defaultUsers = [{
+            id: '1',
+            name: 'Ann',
+            realName: '김수임',
+            email: 'ann.88toy@gmail.com',
+            userId: 'ann',
+            password: '0000',
+            role: '관리자',
+            department: '브랜드사업부',
+            team: '경영지원팀',
+            status: 'active' as const,
+            lastLogin: new Date().toLocaleString('ko-KR', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false
+            }).replace(/\. /g, '-').replace(/\./g, '').replace(/:/g, ':'),
+            profileImage: ''
+          }];
+          setUsers(defaultUsers);
+          localStorage.setItem('users', JSON.stringify(defaultUsers));
+        }
+      } catch (error) {
+        console.error('Error loading users:', error);
+      }
+    };
+
+    loadUsers();
+    
+    // 사용자 데이터 업데이트 이벤트 리스너
+    const handleUserDataUpdate = (event: CustomEvent) => {
+      if (event.detail.updatedUsers) {
+        setUsers(event.detail.updatedUsers);
+      }
+    };
+    
+    window.addEventListener('userDataUpdated', handleUserDataUpdate as EventListener);
+    
+    return () => {
+      window.removeEventListener('userDataUpdated', handleUserDataUpdate as EventListener);
+    };
   }, []);
 
-  // 권한 저장
-  const savePermissions = () => {
-    localStorage.setItem('88erp_page_permissions', JSON.stringify(pagePermissions));
-    window.dispatchEvent(new CustomEvent('pagePermissionsUpdated', {
-      detail: { permissions: pagePermissions }
-    }));
-    alert('페이지 권한이 저장되었습니다.');
-  };
-
-  // 카테고리 토글
-  const toggleCategory = (category: string) => {
-    setExpandedCategories(prev =>
-      prev.includes(category)
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
-    );
-  };
-
-  // 권한 토글
-  const togglePermission = (path: string, roleId: string, isCategory: boolean = false) => {
-    setPagePermissions(prev => {
-      const updated = [...prev];
-      
-      const updatePage = (pages: PagePermission[]): PagePermission[] => {
-        return pages.map(page => {
-          if (page.path === path) {
-            const newAllowedRoles = page.allowedRoles.includes(roleId)
-              ? page.allowedRoles.filter(r => r !== roleId)
-              : [...page.allowedRoles, roleId];
-            
-            // 카테고리인 경우 하위 페이지도 업데이트
-            if (isCategory && page.children) {
-              return {
-                ...page,
-                allowedRoles: newAllowedRoles,
-                children: page.children.map(child => ({
-                  ...child,
-                  allowedRoles: newAllowedRoles
-                }))
-              };
-            }
-            
-            return { ...page, allowedRoles: newAllowedRoles };
-          }
-          
-          if (page.children) {
-            return { ...page, children: updatePage(page.children) };
-          }
-          
-          return page;
-        });
-      };
-      
-      const result = updatePage(updated);
-      
-      // 자동 저장
-      localStorage.setItem('88erp_page_permissions', JSON.stringify(result));
-      
-      return result;
+  // 편집 시작
+  const startEdit = (user: User) => {
+    setEditingUser(user.id);
+    setEditForm({ 
+      password: user.password || '', 
+      userId: user.userId || user.email.split('@')[0],
+      name: user.name || ''
     });
+  };
+
+  // 편집 저장
+  const saveEdit = (userId: string) => {
+    const currentDate = new Date().toLocaleString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }).replace(/\. /g, '-').replace(/\./g, '').replace(/:/g, ':');
+    
+    const updatedUsers = users.map(user => 
+      user.id === userId ? { 
+        ...user, 
+        password: editForm.password,
+        userId: editForm.userId,
+        name: editForm.name,
+        lastModified: currentDate
+      } : user
+    );
+    
+    setUsers(updatedUsers);
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    
+    // 사용자 데이터 업데이트 이벤트 발생
+    window.dispatchEvent(new CustomEvent('userDataUpdated', {
+      detail: { updatedUsers }
+    }));
+    
+    setEditingUser(null);
+    setEditForm({ password: '', userId: '', name: '' });
+  };
+
+  // 수정 취소
+  const cancelEdit = () => {
+    setEditingUser(null);
+    setEditForm({ password: '', userId: '', name: '' });
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">페이지설정</h1>
-          <p className="text-gray-600 mt-1">역할별 페이지 접근 권한을 관리합니다</p>
+          <h1 className="text-2xl font-bold text-gray-900">로그인설정</h1>
+          <p className="text-gray-600 mt-1">사용자 로그인 정보를 관리합니다</p>
         </div>
-        <button 
-          onClick={savePermissions} 
-          className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors"
-        >
-          <Save className="w-4 h-4 mr-2" />
-          전체 저장
-        </button>
       </div>
-      
-      <div className="card">
-        <div className="card-body">
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              역할별 페이지 권한
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* 로그인설정 카드 */}
+        <div className="card">
+          <div className="card-header">
+            <h3 className="card-title flex items-center gap-2">
+              <Key className="w-5 h-5" />
+              로그인 정보 관리
             </h3>
           </div>
-
           <div className="overflow-x-auto">
-            <table className="min-w-full">
+            <table className="min-w-full divide-y divide-gray-200">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    페이지
+                <tr className="bg-gray-50">
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                      onClick={() => handleSort('profile')}>
+                    <div className="flex items-center gap-1">
+                      <span>프로필</span>
+                      <div className="flex flex-col">
+                        <ChevronUp className={`w-3 h-3 -mb-1 ${sortField === 'profile' && sortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                        <ChevronDown className={`w-3 h-3 -mt-1 ${sortField === 'profile' && sortDirection === 'desc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                      </div>
+                    </div>
                   </th>
-                  {roles.map(role => (
-                    <th key={role.id} className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[100px]">
-                      {role.name}
-                    </th>
-                  ))}
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                      onClick={() => handleSort('name')}>
+                    <div className="flex items-center gap-1">
+                      <span>닉네임</span>
+                      <div className="flex flex-col">
+                        <ChevronUp className={`w-3 h-3 -mb-1 ${sortField === 'name' && sortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                        <ChevronDown className={`w-3 h-3 -mt-1 ${sortField === 'name' && sortDirection === 'desc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                      </div>
+                    </div>
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                      onClick={() => handleSort('userId')}>
+                    <div className="flex items-center gap-1">
+                      <span>아이디</span>
+                      <div className="flex flex-col">
+                        <ChevronUp className={`w-3 h-3 -mb-1 ${sortField === 'userId' && sortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                        <ChevronDown className={`w-3 h-3 -mt-1 ${sortField === 'userId' && sortDirection === 'desc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                      </div>
+                    </div>
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                      onClick={() => handleSort('password')}>
+                    <div className="flex items-center gap-1">
+                      <span>비밀번호</span>
+                      <div className="flex flex-col">
+                        <ChevronUp className={`w-3 h-3 -mb-1 ${sortField === 'password' && sortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                        <ChevronDown className={`w-3 h-3 -mt-1 ${sortField === 'password' && sortDirection === 'desc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                      </div>
+                    </div>
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    액션
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                      onClick={() => handleSort('role')}>
+                    <div className="flex items-center gap-1">
+                      <span>권한그룹</span>
+                      <div className="flex flex-col">
+                        <ChevronUp className={`w-3 h-3 -mb-1 ${sortField === 'role' && sortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                        <ChevronDown className={`w-3 h-3 -mt-1 ${sortField === 'role' && sortDirection === 'desc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                      </div>
+                    </div>
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                      onClick={() => handleSort('lastModified')}>
+                    <div className="flex items-center gap-1">
+                      <span>마지막 수정일</span>
+                      <div className="flex flex-col">
+                        <ChevronUp className={`w-3 h-3 -mb-1 ${sortField === 'lastModified' && sortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                        <ChevronDown className={`w-3 h-3 -mt-1 ${sortField === 'lastModified' && sortDirection === 'desc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                      </div>
+                    </div>
+                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {roles.length === 0 ? (
-                  <tr>
-                    <td colSpan={2} className="px-4 py-8 text-center text-gray-500">
-                      역할을 먼저 등록해주세요. <a href="/admin/system" className="text-blue-600 hover:underline">기초등록 페이지로 이동</a>
+                {sortedUsers.map(user => (
+                  <tr key={user.id}>
+                    <td className="px-3 py-2 whitespace-nowrap">
+                      {user.profileImage ? (
+                        <img 
+                          src={user.profileImage} 
+                          alt={user.name}
+                          className="h-8 w-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                          <span className="text-xs font-medium text-gray-600">
+                            {user.name?.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
+                      {user.name}
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap">
+                      {editingUser === user.id ? (
+                        <input
+                          type="text"
+                          value={editForm.userId}
+                          onChange={(e) => setEditForm({ ...editForm, userId: e.target.value })}
+                          className="px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 w-24"
+                          placeholder="아이디"
+                        />
+                      ) : (
+                        <span className="text-sm text-gray-900">
+                          {user.userId || user.email.split('@')[0]}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap">
+                      {editingUser === user.id ? (
+                        <input
+                          type="text"
+                          value={editForm.password}
+                          onChange={(e) => setEditForm({ ...editForm, password: e.target.value })}
+                          className="px-2 py-1 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 w-24"
+                          placeholder="새 비밀번호"
+                        />
+                      ) : (
+                        <span className="text-sm text-gray-500">
+                          {user.password || '••••••••'}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap">
+                      {editingUser === user.id ? (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => saveEdit(user.id)}
+                            className="text-green-600 hover:text-green-900"
+                          >
+                            <Save className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={cancelEdit}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => startEdit(user)}
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                        user.role === '관리자' ? 'bg-yellow-100 text-yellow-800' :
+                        user.role === '팀장' || user.role === '매니저' ? 'bg-blue-100 text-blue-800' :
+                        user.role === '팀원' || user.role === '일반사용자' ? 'bg-green-100 text-green-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
+                        {user.role || '미지정'}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-500">
+                      {user.lastModified || '-'}
                     </td>
                   </tr>
-                ) : (
-                  pagePermissions.map(category => (
-                    <React.Fragment key={category.path}>
-                      {/* 카테고리 행 */}
-                      <tr className="bg-gray-50">
-                        <td className="px-4 py-3">
-                          <button
-                            onClick={() => toggleCategory(category.category)}
-                            className="flex items-center gap-2 font-medium text-gray-900"
-                          >
-                            {expandedCategories.includes(category.category) ? (
-                              <ChevronDown className="w-4 h-4" />
-                            ) : (
-                              <ChevronRight className="w-4 h-4" />
-                            )}
-                            {category.name}
-                          </button>
-                        </td>
-                        {roles.map(role => (
-                          <td key={role.id} className="px-4 py-3 text-center">
-                            <button
-                              onClick={() => togglePermission(category.path, role.id, true)}
-                              className="p-1"
-                            >
-                              {category.allowedRoles.includes(role.id) ? (
-                                <Eye className="w-5 h-5 text-green-600" />
-                              ) : (
-                                <EyeOff className="w-5 h-5 text-gray-300" />
-                              )}
-                            </button>
-                          </td>
-                        ))}
-                      </tr>
-                      
-                      {/* 하위 페이지들 */}
-                      {expandedCategories.includes(category.category) && category.children?.map(page => (
-                        <tr key={page.path} className="hover:bg-gray-50">
-                          <td className="px-4 py-3 pl-12">
-                            <span className="text-sm text-gray-700">{page.name}</span>
-                          </td>
-                          {roles.map(role => (
-                            <td key={role.id} className="px-4 py-3 text-center">
-                              <button
-                                onClick={() => togglePermission(page.path, role.id)}
-                                className="p-1"
-                              >
-                                {page.allowedRoles.includes(role.id) ? (
-                                  <Eye className="w-4 h-4 text-green-600" />
-                                ) : (
-                                  <EyeOff className="w-4 h-4 text-gray-300" />
-                                )}
-                              </button>
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </React.Fragment>
-                  ))
-                )}
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* 최근 로그인 현황 */}
+        <div className="card">
+          <div className="card-header">
+            <h3 className="card-title flex items-center gap-2">
+              <Clock className="w-5 h-5" />
+              최근 로그인 현황
+            </h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                      onClick={() => handleLoginSort('profile')}>
+                    <div className="flex items-center gap-1">
+                      <span>프로필</span>
+                      <div className="flex flex-col">
+                        <ChevronUp className={`w-3 h-3 -mb-1 ${loginSortField === 'profile' && loginSortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                        <ChevronDown className={`w-3 h-3 -mt-1 ${loginSortField === 'profile' && loginSortDirection === 'desc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                      </div>
+                    </div>
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                      onClick={() => handleLoginSort('name')}>
+                    <div className="flex items-center gap-1">
+                      <span>닉네임</span>
+                      <div className="flex flex-col">
+                        <ChevronUp className={`w-3 h-3 -mb-1 ${loginSortField === 'name' && loginSortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                        <ChevronDown className={`w-3 h-3 -mt-1 ${loginSortField === 'name' && loginSortDirection === 'desc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                      </div>
+                    </div>
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                      onClick={() => handleLoginSort('department')}>
+                    <div className="flex items-center gap-1">
+                      <span>부서</span>
+                      <div className="flex flex-col">
+                        <ChevronUp className={`w-3 h-3 -mb-1 ${loginSortField === 'department' && loginSortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                        <ChevronDown className={`w-3 h-3 -mt-1 ${loginSortField === 'department' && loginSortDirection === 'desc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                      </div>
+                    </div>
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                      onClick={() => handleLoginSort('team')}>
+                    <div className="flex items-center gap-1">
+                      <span>팀</span>
+                      <div className="flex flex-col">
+                        <ChevronUp className={`w-3 h-3 -mb-1 ${loginSortField === 'team' && loginSortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                        <ChevronDown className={`w-3 h-3 -mt-1 ${loginSortField === 'team' && loginSortDirection === 'desc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                      </div>
+                    </div>
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                      onClick={() => handleLoginSort('status')}>
+                    <div className="flex items-center gap-1">
+                      <span>접속여부</span>
+                      <div className="flex flex-col">
+                        <ChevronUp className={`w-3 h-3 -mb-1 ${loginSortField === 'status' && loginSortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                        <ChevronDown className={`w-3 h-3 -mt-1 ${loginSortField === 'status' && loginSortDirection === 'desc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                      </div>
+                    </div>
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+                      onClick={() => handleLoginSort('lastLogin')}>
+                    <div className="flex items-center gap-1">
+                      <span>마지막 로그인</span>
+                      <div className="flex flex-col">
+                        <ChevronUp className={`w-3 h-3 -mb-1 ${loginSortField === 'lastLogin' && loginSortDirection === 'asc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                        <ChevronDown className={`w-3 h-3 -mt-1 ${loginSortField === 'lastLogin' && loginSortDirection === 'desc' ? 'text-blue-600' : 'text-gray-400'}`} />
+                      </div>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {[...users].sort((a, b) => {
+                  if (!loginSortField) return 0;
+                  
+                  let aValue: any = a[loginSortField as keyof User];
+                  let bValue: any = b[loginSortField as keyof User];
+                  
+                  // 특별한 정렬 처리
+                  if (loginSortField === 'profile') {
+                    aValue = a.name || '';
+                    bValue = b.name || '';
+                  }
+                  
+                  // null/undefined 처리
+                  if (aValue == null) aValue = '';
+                  if (bValue == null) bValue = '';
+                  
+                  // 문자열 비교
+                  const comparison = aValue.toString().localeCompare(bValue.toString(), 'ko');
+                  return loginSortDirection === 'asc' ? comparison : -comparison;
+                }).map(user => (
+                  <tr key={user.id}>
+                    <td className="px-3 py-2 whitespace-nowrap">
+                      {user.profileImage ? (
+                        <img 
+                          src={user.profileImage} 
+                          alt={user.name}
+                          className="h-8 w-8 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                          <span className="text-xs font-medium text-gray-600">
+                            {user.name?.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
+                      {user.name}
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
+                      {user.department}
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
+                      {user.team || '-'}
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap">
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                        user.status === 'active' 
+                          ? 'bg-yellow-100 text-yellow-800' 
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {user.status === 'active' ? '로그인' : '로그아웃'}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-500">
+                      {user.lastLogin ? 
+                        new Date(user.lastLogin).toLocaleString('ko-KR', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: false
+                        }).replace(/\. /g, '-').replace(/\./g, '').replace(' ', ' ') 
+                        : '-'
+                      }
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

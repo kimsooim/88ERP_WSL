@@ -1182,25 +1182,25 @@ export default function AdminSystemPage() {
 
             <div className="overflow-x-auto">
               <table className="min-w-full">
-                <thead>
-                  <tr className="bg-gray-50 border-b border-gray-200">
-                    <th className="w-12 px-2 py-1"></th>
-                    <th className="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <thead className="bg-gray-50">
+                  <tr className="border-b border-gray-200">
+                    <th className="w-12 px-2 py-2"></th>
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       권한그룹명
                     </th>
-                    <th className="px-3 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       소속 사용자
                     </th>
-                    <th className="px-3 py-1 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       읽기
                     </th>
-                    <th className="px-3 py-1 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       수정
                     </th>
-                    <th className="px-3 py-1 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                       삭제
                     </th>
-                    <th className="px-3 py-1 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       작업
                     </th>
                   </tr>
@@ -1554,8 +1554,8 @@ export default function AdminSystemPage() {
 
             <div className="overflow-x-auto">
               <table className="min-w-full">
-                <thead>
-                  <tr className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gray-50">
+                  <tr className="border-b border-gray-200">
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       페이지
                     </th>
