@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { LogProvider } from './contexts/LogContext'
-import { AuthProvider } from './contexts/AuthContext'
+import { Providers } from './providers'
 
 export const metadata: Metadata = {
   title: '88ERP - Enterprise Resource Planning System',
@@ -22,11 +21,9 @@ export default function RootLayout({
         />
       </head>
       <body className="font-pretendard">
-        <AuthProvider>
-          <LogProvider>
-            {children}
-          </LogProvider>
-        </AuthProvider>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   )

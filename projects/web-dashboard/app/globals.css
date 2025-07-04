@@ -65,6 +65,10 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
 
+  .card-body {
+    @apply p-0;
+  }
+
   .card-header {
     @apply mb-4 pb-3 border-b border-gray-100;
   }

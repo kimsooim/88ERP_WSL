@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { FiHome, FiPackage, FiShoppingCart, FiUsers, FiTruck, FiDollarSign, FiActivity, FiUser, FiSettings, FiFileText, FiTrendingUp, FiCreditCard, FiBriefcase, FiClipboard, FiCalendar, FiBell, FiSearch, FiLogOut } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -73,8 +73,8 @@ const menuItems: { [key: string]: MenuItem[] } = {
     { name: '자동화', href: '/mypage/automation', icon: <FiSettings className="w-4 h-4" /> }
   ],
   admin: [
+    { name: '기초등록', href: '/admin/system', icon: <FiSettings className="w-4 h-4" /> },
     { name: '사용자관리', href: '/admin/users', icon: <FiUsers className="w-4 h-4" /> },
-    { name: '시스템설정', href: '/admin/system', icon: <FiSettings className="w-4 h-4" /> },
     { name: '페이지설정', href: '/admin/pages', icon: <FiFileText className="w-4 h-4" /> },
     { name: '로그관리', href: '/admin/logs', icon: <FiActivity className="w-4 h-4" /> },
     { name: '서버관리', href: '/admin/servers', icon: <FiTrendingUp className="w-4 h-4" /> }
@@ -87,6 +87,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, logout, isAuthenticated } = useAuth();
   const [activeCategory, setActiveCategory] = useState('online');
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -123,7 +124,7 @@ export default function DashboardLayout({
     setActiveCategory(category);
     // 해당 카테고리의 첫 번째 메뉴로 이동
     if (menuItems[category] && menuItems[category].length > 0) {
-      window.location.href = menuItems[category][0].href;
+      router.push(menuItems[category][0].href);
     }
   };
 
@@ -164,17 +165,17 @@ export default function DashboardLayout({
               {/* 상단 카테고리 네비게이션 */}
               <nav className="flex items-center gap-1">
                 {Object.keys(menuItems).map((key) => (
-                  <button
+                  <Link
                     key={key}
-                    onClick={() => handleCategoryClick(key)}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                    href={menuItems[key][0]?.href || '/'}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                       activeCategory === key
                         ? 'bg-blue-500 text-white'
                         : 'text-blue-100 hover:bg-blue-500 hover:text-white'
                     }`}
                   >
                     {getCategoryName(key)}
-                  </button>
+                  </Link>
                 ))}
               </nav>
             </div>

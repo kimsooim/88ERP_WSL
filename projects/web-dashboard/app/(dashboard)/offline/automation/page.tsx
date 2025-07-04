@@ -310,6 +310,8 @@ export default function OfflineAutomationPage() {
 
   const handleEditStore = (storeId: string, field: string, value: string) => {
     const store = stores.find(s => s.id === storeId);
+    if (!store) return;
+    
     const oldValue = getStoreInfo(store, field);
     
     setStoreInfo(prev => ({
@@ -568,7 +570,7 @@ export default function OfflineAutomationPage() {
                               {workflow?.step}단계 성공
                             </div>
                           )}
-                          {!workflow && !isRunning && !isCompleted && workflow?.status !== 'failed' && (
+                          {!workflow && !isRunning && !isCompleted && (
                             <div className="text-sm text-gray-400">대기</div>
                           )}
                         </div>
@@ -778,7 +780,7 @@ export default function OfflineAutomationPage() {
                       )}
                       {workflow.startTime && (
                         <span className="ml-2">
-                          • 소요시간: {Math.round((new Date() - new Date(workflow.startTime)) / 1000)}초
+                          • 소요시간: {Math.round((new Date().getTime() - new Date(workflow.startTime).getTime()) / 1000)}초
                         </span>
                       )}
                     </p>
@@ -911,28 +913,29 @@ export default function OfflineAutomationPage() {
                             이메일 수신자
                           </label>
                           <div className="space-y-2">
-                            {(storeSettings[settingsModal.storeId]?.emails || ['ann@88toy.co.kr']).map((email, index) => (
+                            {(storeSettings[settingsModal.storeId]?.emails || ['ann@88toy.co.kr']).map((email: string, index: number) => (
                               <div key={index} className="flex items-center gap-2">
                                 <input
                                   type="email"
                                   value={email}
                                   onChange={(e) => {
+                                    if (!settingsModal.storeId) return;
                                     const newEmails = [...(storeSettings[settingsModal.storeId]?.emails || [])];
                                     newEmails[index] = e.target.value;
                                     setStoreSettings(prev => ({
                                       ...prev,
-                                      [settingsModal.storeId]: {
-                                        ...prev[settingsModal.storeId],
+                                      [settingsModal.storeId!]: {
+                                        ...prev[settingsModal.storeId!],
                                         emails: newEmails
                                       }
                                     }));
                                   }}
                                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                                 />
-                                {(storeSettings[settingsModal.storeId]?.emails?.length || 1) > 1 && (
+                                {(storeSettings[settingsModal.storeId!]?.emails?.length || 1) > 1 && (
                                   <button
                                     type="button"
-                                    onClick={() => handleRemoveEmail(settingsModal.storeId, index)}
+                                    onClick={() => settingsModal.storeId && handleRemoveEmail(settingsModal.storeId, index)}
                                     className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                     title="삭제"
                                   >
@@ -945,7 +948,7 @@ export default function OfflineAutomationPage() {
                             ))}
                             <button
                               type="button"
-                              onClick={() => handleAddEmail(settingsModal.storeId)}
+                              onClick={() => settingsModal.storeId && handleAddEmail(settingsModal.storeId)}
                               className="w-full py-2 px-3 border-2 border-dashed border-gray-300 rounded-md text-sm text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-colors"
                             >
                               + 이메일 추가
@@ -960,14 +963,17 @@ export default function OfflineAutomationPage() {
                           </label>
                           <input
                             type="text"
-                            value={storeSettings[settingsModal.storeId]?.dataPath || ''}
-                            onChange={(e) => setStoreSettings(prev => ({
-                              ...prev,
-                              [settingsModal.storeId]: {
-                                ...prev[settingsModal.storeId],
-                                dataPath: e.target.value
-                              }
-                            }))}
+                            value={storeSettings[settingsModal.storeId!]?.dataPath || ''}
+                            onChange={(e) => {
+                              if (!settingsModal.storeId) return;
+                              setStoreSettings(prev => ({
+                                ...prev,
+                                [settingsModal.storeId!]: {
+                                  ...prev[settingsModal.storeId!],
+                                  dataPath: e.target.value
+                                }
+                              }));
+                            }}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                           />
                         </div>
@@ -980,20 +986,23 @@ export default function OfflineAutomationPage() {
                           <div className="flex items-center gap-2">
                             <input
                               type="url"
-                              value={storeSettings[settingsModal.storeId]?.supabaseUrl || ''}
-                              onChange={(e) => setStoreSettings(prev => ({
-                                ...prev,
-                                [settingsModal.storeId]: {
-                                  ...prev[settingsModal.storeId],
-                                  supabaseUrl: e.target.value
-                                }
-                              }))}
+                              value={storeSettings[settingsModal.storeId!]?.supabaseUrl || ''}
+                              onChange={(e) => {
+                                if (!settingsModal.storeId) return;
+                                setStoreSettings(prev => ({
+                                  ...prev,
+                                  [settingsModal.storeId!]: {
+                                    ...prev[settingsModal.storeId!],
+                                    supabaseUrl: e.target.value
+                                  }
+                                }));
+                              }}
                               placeholder="https://supabase.com/workflow/..."
                               className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                             />
-                            {storeSettings[settingsModal.storeId]?.supabaseUrl && (
+                            {storeSettings[settingsModal.storeId!]?.supabaseUrl && (
                               <a
-                                href={storeSettings[settingsModal.storeId].supabaseUrl}
+                                href={storeSettings[settingsModal.storeId!].supabaseUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
@@ -1012,14 +1021,17 @@ export default function OfflineAutomationPage() {
                           <label className="flex items-center">
                             <input
                               type="checkbox"
-                              checked={storeSettings[settingsModal.storeId]?.autoStart || false}
-                              onChange={(e) => setStoreSettings(prev => ({
-                                ...prev,
-                                [settingsModal.storeId]: {
-                                  ...prev[settingsModal.storeId],
-                                  autoStart: e.target.checked
-                                }
-                              }))}
+                              checked={storeSettings[settingsModal.storeId!]?.autoStart || false}
+                              onChange={(e) => {
+                                if (!settingsModal.storeId) return;
+                                setStoreSettings(prev => ({
+                                  ...prev,
+                                  [settingsModal.storeId!]: {
+                                    ...prev[settingsModal.storeId!],
+                                    autoStart: e.target.checked
+                                  }
+                                }));
+                              }}
                               className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                             />
                             <span className="ml-2 text-sm text-gray-700">
@@ -1029,7 +1041,7 @@ export default function OfflineAutomationPage() {
                         </div>
 
                         {/* 자동 실행 설정 */}
-                        {storeSettings[settingsModal.storeId]?.autoStart && (
+                        {storeSettings[settingsModal.storeId!]?.autoStart && (
                           <>
                             <div>
                               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1048,17 +1060,20 @@ export default function OfflineAutomationPage() {
                                   <label key={day.key} className="flex items-center justify-center">
                                     <input
                                       type="checkbox"
-                                      checked={storeSettings[settingsModal.storeId]?.scheduleDays?.[day.key] || false}
-                                      onChange={(e) => setStoreSettings(prev => ({
-                                        ...prev,
-                                        [settingsModal.storeId]: {
-                                          ...prev[settingsModal.storeId],
-                                          scheduleDays: {
-                                            ...prev[settingsModal.storeId].scheduleDays,
-                                            [day.key]: e.target.checked
+                                      checked={storeSettings[settingsModal.storeId!]?.scheduleDays?.[day.key] || false}
+                                      onChange={(e) => {
+                                        if (!settingsModal.storeId) return;
+                                        setStoreSettings(prev => ({
+                                          ...prev,
+                                          [settingsModal.storeId!]: {
+                                            ...prev[settingsModal.storeId!],
+                                            scheduleDays: {
+                                              ...prev[settingsModal.storeId!].scheduleDays,
+                                              [day.key]: e.target.checked
+                                            }
                                           }
-                                        }
-                                      }))}
+                                        }));
+                                      }}
                                       className="sr-only peer"
                                     />
                                     <div className="w-10 h-10 flex items-center justify-center rounded-lg border-2 border-gray-300 peer-checked:bg-blue-600 peer-checked:border-blue-600 peer-checked:text-white cursor-pointer transition-all">
@@ -1075,14 +1090,17 @@ export default function OfflineAutomationPage() {
                               </label>
                               <input
                                 type="time"
-                                value={storeSettings[settingsModal.storeId]?.scheduleTime || '09:00'}
-                                onChange={(e) => setStoreSettings(prev => ({
-                                  ...prev,
-                                  [settingsModal.storeId]: {
-                                    ...prev[settingsModal.storeId],
-                                    scheduleTime: e.target.value
-                                  }
-                                }))}
+                                value={storeSettings[settingsModal.storeId!]?.scheduleTime || '09:00'}
+                                onChange={(e) => {
+                                  if (!settingsModal.storeId) return;
+                                  setStoreSettings(prev => ({
+                                    ...prev,
+                                    [settingsModal.storeId!]: {
+                                      ...prev[settingsModal.storeId!],
+                                      scheduleTime: e.target.value
+                                    }
+                                  }));
+                                }}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                               />
                             </div>
@@ -1092,14 +1110,17 @@ export default function OfflineAutomationPage() {
                                 실행 컴퓨터
                               </label>
                               <select
-                                value={storeSettings[settingsModal.storeId]?.executionComputer || 'ANN PC'}
-                                onChange={(e) => setStoreSettings(prev => ({
-                                  ...prev,
-                                  [settingsModal.storeId]: {
-                                    ...prev[settingsModal.storeId],
-                                    executionComputer: e.target.value
-                                  }
-                                }))}
+                                value={storeSettings[settingsModal.storeId!]?.executionComputer || 'ANN PC'}
+                                onChange={(e) => {
+                                  if (!settingsModal.storeId) return;
+                                  setStoreSettings(prev => ({
+                                    ...prev,
+                                    [settingsModal.storeId!]: {
+                                      ...prev[settingsModal.storeId!],
+                                      executionComputer: e.target.value
+                                    }
+                                  }));
+                                }}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                               >
                                 <option value="ANN PC">ANN PC</option>

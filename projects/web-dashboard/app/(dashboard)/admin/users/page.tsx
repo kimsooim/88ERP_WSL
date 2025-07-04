@@ -1,64 +1,290 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLog } from '../../../contexts/LogContext';
 
 interface User {
   id: string;
-  name: string;
+  name: string; // 닉네임 (표시용)
+  realName?: string; // 실제 이름
   email: string;
-  role: 'admin' | 'manager' | 'user';
+  role: string; // 권한그룹 (기초등록과 동기화)
   department: string;
+  team?: string;
+  jobTitle?: string; // 직급
+  position?: string; // 포지션
+  workRole?: string; // 업무역할
   status: 'active' | 'inactive';
   createdAt: string;
   lastLogin?: string;
   phone?: string;
   profileImage?: string;
   password?: string;
+  // 마이페이지와 동기화될 추가 필드
+  birthDate?: string; // 생년월일
+  joinDate?: string; // 입사일
+  address?: string; // 주소
+  workPeriod?: string; // 근무기간 (계산된 값)
+  mbti?: string; // MBTI
+  resignDate?: string; // 퇴사일
+  resignReason?: string; // 퇴사사유
 }
 
-export default function AdminUsersPage() {
-  const { addChangeLog } = useLog();
-  const [users, setUsers] = useState<User[]>([
+// 근무 기간 계산 함수 (컴포넌트 외부에 정의)
+const calculateWorkPeriod = (joinDate: string) => {
+  try {
+    const join = new Date(joinDate);
+    const today = new Date();
+    
+    let years = today.getFullYear() - join.getFullYear();
+    let months = today.getMonth() - join.getMonth();
+    let days = today.getDate() - join.getDate();
+    
+    if (days < 0) {
+      months--;
+      const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+      days += lastMonth.getDate();
+    }
+    
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+    
+    return `${years}년 ${months}개월 ${days}일`;
+  } catch (error) {
+    console.error('Error calculating work period:', error);
+    return '-';
+  }
+};
+
+// 기본 사용자 데이터 반환 함수
+const getDefaultUsers = () => {
+  return [
     {
       id: '1',
       name: 'Ann',
-      email: 'ann@88toy.co.kr',
-      role: 'admin',
-      department: '경영지원',
-      status: 'active',
+      realName: '김수임',
+      email: 'ann.88toy@gmail.com',
+      role: '관리자',
+      department: '브랜드사업부',
+      team: '경영지원팀',
+      jobTitle: '대표이사',
+      position: 'Brand Director',
+      workRole: '브랜드 총괄 및 경영전략 수립',
+      status: 'active' as const,
       createdAt: '2024-01-01',
-      lastLogin: '2025-07-01 16:30',
-      phone: '010-1234-5678'
-    },
-    {
-      id: '2',
-      name: 'Rozy',
-      email: 'rozy@88toy.co.kr',
-      role: 'manager',
-      department: '영업',
-      status: 'active',
-      createdAt: '2024-03-15',
-      lastLogin: '2025-07-01 14:20',
-      phone: '010-2345-6789'
+      lastLogin: new Date().toLocaleString('ko-KR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).replace(/\. /g, '-').replace(/\./g, '').replace(/:/g, ':'),
+      phone: '010-1234-5678',
+      birthDate: '1990-01-01',
+      joinDate: '2024-01-01',
+      address: '서울특별시 강남구 테헤란로 123',
+      workPeriod: calculateWorkPeriod('2024-01-01'),
+      password: '0000',
+      profileImage: ''
     }
+  ];
+};
+
+export default function AdminUsersPage() {
+  console.log('AdminUsersPage component rendering');
+  const { addChangeLog } = useLog();
+  const [systemRoles, setSystemRoles] = useState<any[]>([
+    { id: '1', name: '관리자', description: '전체 시스템 관리' },
+    { id: '2', name: '매니저', description: '팀 관리 및 운영' },
+    { id: '3', name: '일반사용자', description: '일반 업무 수행' }
   ]);
+  const [systemDepartments, setSystemDepartments] = useState<any[]>([
+    { id: '1', name: '브랜드사업부', type: 'department' },
+    { id: '2', name: '생산물류팀', type: 'department' }
+  ]);
+  const [systemTeams, setSystemTeams] = useState<any[]>([
+    { id: '3', name: '경영지원팀', type: 'team', parentId: '1' },
+    { id: '4', name: '온라인팀', type: 'team', parentId: '1' }
+  ]);
+  const [users, setUsers] = useState<User[]>(getDefaultUsers());
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [formData, setFormData] = useState({
     name: '',
+    realName: '',
     email: '',
-    role: 'user' as 'admin' | 'manager' | 'user',
+    role: '',
     department: '',
+    team: '',
+    jobTitle: '',
+    position: '',
+    workRole: '',
     phone: '',
     status: 'active' as 'active' | 'inactive',
     profileImage: '',
-    password: ''
+    password: '',
+    birthDate: '',
+    joinDate: '',
+    address: '',
+    mbti: '',
+    resignDate: '',
+    resignReason: ''
   });
 
-  const departments = ['경영지원', '영업', '마케팅', '개발', '디자인', '생산', '물류'];
+  // localStorage에서 시스템 설정 불러오기
+  useEffect(() => {
+    const loadSystemSettings = () => {
+      console.log('Loading system settings...');
+      
+      // 기본 사용자 데이터 설정
+      const defaultUsers = getDefaultUsers();
+      setUsers(defaultUsers);
+      
+      // 브라우저 환경에서만 localStorage 접근
+      if (typeof window !== 'undefined') {
+        try {
+          // localStorage에서 데이터 불러오기 시도
+          const savedUsers = localStorage.getItem('users');
+          if (savedUsers && savedUsers !== 'undefined') {
+            try {
+              const parsedUsers = JSON.parse(savedUsers);
+              if (Array.isArray(parsedUsers) && parsedUsers.length > 0) {
+                // Ann 계정을 항상 첫 번째로 정렬
+                const annUser = parsedUsers.find((u: User) => u.name === 'Ann' || u.email === 'ann.88toy@gmail.com');
+                const otherUsers = parsedUsers.filter((u: User) => u.name !== 'Ann' && u.email !== 'ann.88toy@gmail.com');
+                
+                if (annUser) {
+                  setUsers([annUser, ...otherUsers]);
+                } else {
+                  setUsers([defaultUsers[0], ...parsedUsers]);
+                }
+              }
+            } catch (parseError) {
+              console.error('JSON parse error:', parseError);
+            }
+          }
+        } catch (error) {
+          console.error('Error accessing localStorage:', error);
+        }
+
+        // 역할 데이터 불러오기
+        try {
+          const savedRoles = localStorage.getItem('88erp_roles');
+          if (savedRoles) {
+            setSystemRoles(JSON.parse(savedRoles));
+          } else {
+            setSystemRoles([
+              { id: '1', name: '관리자', description: '전체 시스템 관리' },
+              { id: '2', name: '매니저', description: '팀 관리 및 운영' },
+              { id: '3', name: '일반사용자', description: '일반 업무 수행' }
+            ]);
+          }
+        } catch (error) {
+          console.error('Error loading roles:', error);
+          setSystemRoles([
+            { id: '1', name: '관리자', description: '전체 시스템 관리' },
+            { id: '2', name: '매니저', description: '팀 관리 및 운영' },
+            { id: '3', name: '일반사용자', description: '일반 업무 수행' }
+          ]);
+        }
+        
+        // 부서/팀 데이터 불러오기
+        try {
+          const savedDepartments = localStorage.getItem('88erp_departments');
+          if (savedDepartments) {
+            const depts = JSON.parse(savedDepartments);
+            setSystemDepartments(depts.filter((d: any) => d.type === 'department'));
+            setSystemTeams(depts.filter((d: any) => d.type === 'team'));
+          } else {
+            setSystemDepartments([
+              { id: '1', name: '브랜드사업부', type: 'department' },
+              { id: '2', name: '생산물류팀', type: 'department' }
+            ]);
+            setSystemTeams([
+              { id: '3', name: '경영지원팀', type: 'team', parentId: '1' },
+              { id: '4', name: '온라인팀', type: 'team', parentId: '1' }
+            ]);
+          }
+        } catch (error) {
+          console.error('Error loading departments:', error);
+          setSystemDepartments([
+            { id: '1', name: '브랜드사업부', type: 'department' },
+            { id: '2', name: '생산물류팀', type: 'department' }
+          ]);
+          setSystemTeams([
+            { id: '3', name: '경영지원팀', type: 'team', parentId: '1' },
+            { id: '4', name: '온라인팀', type: 'team', parentId: '1' }
+          ]);
+        }
+      } else {
+        // localStorage를 사용할 수 없는 경우 기본값 설정
+        setSystemRoles([
+          { id: '1', name: '관리자', description: '전체 시스템 관리' },
+          { id: '2', name: '매니저', description: '팀 관리 및 운영' },
+          { id: '3', name: '일반사용자', description: '일반 업무 수행' }
+        ]);
+        setSystemDepartments([
+          { id: '1', name: '브랜드사업부', type: 'department' },
+          { id: '2', name: '생산물류팀', type: 'department' }
+        ]);
+        setSystemTeams([
+          { id: '3', name: '경영지원팀', type: 'team', parentId: '1' },
+          { id: '4', name: '온라인팀', type: 'team', parentId: '1' }
+        ]);
+      }
+    };
+    
+    loadSystemSettings();
+    
+    // 시스템 설정 업데이트 이벤트 리스너
+    const handleSettingsUpdate = (event: CustomEvent) => {
+      console.log('기초등록 업데이트 이벤트:', event.detail);
+      
+      if (event.detail.roles) {
+        setSystemRoles(event.detail.roles);
+      }
+      
+      if (event.detail.departments) {
+        // 부서와 팀을 분리하여 저장
+        const depts = event.detail.departments;
+        setSystemDepartments(depts.filter((d: any) => d.type === 'department'));
+        setSystemTeams(depts.filter((d: any) => d.type === 'team'));
+        
+        // localStorage에도 업데이트
+        localStorage.setItem('88erp_departments', JSON.stringify(depts));
+      }
+    };
+
+    // 마이페이지에서 사용자 데이터 업데이트 이벤트 리스너
+    const handleUserDataUpdate = (event: CustomEvent) => {
+      if (event.detail.updatedUsers) {
+        const users = event.detail.updatedUsers;
+        // Ann 계정을 항상 첫 번째로 정렬
+        const annUser = users.find((u: User) => u.name === 'Ann' || u.email === 'ann.88toy@gmail.com' || u.email === 'ann@88toy.co.kr');
+        const otherUsers = users.filter((u: User) => u.name !== 'Ann' && u.email !== 'ann.88toy@gmail.com' && u.email !== 'ann@88toy.co.kr');
+        
+        if (annUser) {
+          setUsers([annUser, ...otherUsers]);
+        } else {
+          setUsers(users);
+        }
+      }
+    };
+    
+    window.addEventListener('systemSettingsUpdated', handleSettingsUpdate as EventListener);
+    window.addEventListener('userDataUpdated', handleUserDataUpdate as EventListener);
+    
+    return () => {
+      window.removeEventListener('systemSettingsUpdated', handleSettingsUpdate as EventListener);
+      window.removeEventListener('userDataUpdated', handleUserDataUpdate as EventListener);
+    };
+  }, []);
+  
   
   // 비밀번호 초기화
   const handlePasswordReset = (user: User) => {
@@ -89,22 +315,45 @@ export default function AdminUsersPage() {
     const newUser: User = {
       id: Date.now().toString(),
       name: formData.name,
+      realName: formData.realName,
       email: formData.email,
       role: formData.role,
       department: formData.department,
+      team: formData.team,
+      jobTitle: formData.jobTitle,
+      position: formData.position,
+      workRole: formData.workRole,
       status: formData.status,
       phone: formData.phone,
       profileImage: formData.profileImage,
       password: formData.password || 'password123',
-      createdAt: new Date().toISOString().split('T')[0]
+      createdAt: new Date().toISOString().split('T')[0],
+      birthDate: formData.birthDate,
+      joinDate: formData.joinDate || new Date().toISOString().split('T')[0],
+      address: formData.address,
+      workPeriod: formData.joinDate ? calculateWorkPeriod(formData.joinDate) : calculateWorkPeriod(new Date().toISOString().split('T')[0]),
+      mbti: formData.mbti,
+      resignDate: formData.resignDate
     };
 
-    setUsers([...users, newUser]);
+    // Ann을 첫 번째로 유지하면서 새 사용자 추가
+    const updatedUsers = [...users, newUser];
+    const annUser = updatedUsers.find(u => u.name === 'Ann' || u.email === 'ann.88toy@gmail.com' || u.email === 'ann@88toy.co.kr');
+    const otherUsers = updatedUsers.filter(u => u.name !== 'Ann' && u.email !== 'ann.88toy@gmail.com' && u.email !== 'ann@88toy.co.kr');
+    
+    if (annUser) {
+      setUsers([annUser, ...otherUsers]);
+    } else {
+      setUsers(updatedUsers);
+    }
     
     // localStorage의 users에도 저장 (Auth 시스템과 연동)
-    const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
-    storedUsers.push(newUser);
-    localStorage.setItem('users', JSON.stringify(storedUsers));
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    
+    // 마이페이지에 새 사용자 추가 알림
+    window.dispatchEvent(new CustomEvent('userDataUpdated', {
+      detail: { updatedUsers }
+    }));
     
     // 로그 기록
     addChangeLog({
@@ -124,13 +373,57 @@ export default function AdminUsersPage() {
   const handleEditUser = () => {
     if (!editingUser) return;
 
+    const updatedUser = { 
+      ...editingUser, 
+      ...formData,
+      workPeriod: formData.joinDate ? calculateWorkPeriod(formData.joinDate) : editingUser.workPeriod
+    };
+
     const updatedUsers = users.map(user => 
       user.id === editingUser.id 
-        ? { ...user, ...formData }
+        ? updatedUser
         : user
     );
 
-    setUsers(updatedUsers);
+    // Ann을 첫 번째로 유지
+    const annUser = updatedUsers.find(u => u.name === 'Ann' || u.email === 'ann.88toy@gmail.com' || u.email === 'ann@88toy.co.kr');
+    const otherUsers = updatedUsers.filter(u => u.name !== 'Ann' && u.email !== 'ann.88toy@gmail.com' && u.email !== 'ann@88toy.co.kr');
+    
+    if (annUser) {
+      setUsers([annUser, ...otherUsers]);
+    } else {
+      setUsers(updatedUsers);
+    }
+    
+    // localStorage 업데이트
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+
+    // 마이페이지에 업데이트 이벤트 전송
+    window.dispatchEvent(new CustomEvent('userDataUpdated', {
+      detail: { updatedUsers }
+    }));
+
+    // 현재 로그인한 사용자인 경우 마이페이지와 동기화
+    if (updatedUser.email) {
+      const userAdditionalInfo = {
+        phone: updatedUser.phone || '',
+        address: updatedUser.address || '',
+        birthDate: updatedUser.birthDate || '',
+        joinDate: updatedUser.joinDate || updatedUser.createdAt || ''
+      };
+      
+      // 현재 사용자의 추가 정보 업데이트
+      const currentUserInfo = localStorage.getItem('userAdditionalInfo');
+      if (currentUserInfo) {
+        try {
+          const currentInfo = JSON.parse(currentUserInfo);
+          // 이메일이 일치하는 경우만 업데이트 (실제로는 현재 로그인 사용자 체크가 필요)
+          localStorage.setItem('userAdditionalInfo', JSON.stringify(userAdditionalInfo));
+        } catch (error) {
+          console.error('추가 정보 동기화 오류:', error);
+        }
+      }
+    }
 
     // 로그 기록
     addChangeLog({
@@ -149,8 +442,18 @@ export default function AdminUsersPage() {
   };
 
   const handleDeleteUser = (user: User) => {
+    // Ann 계정은 삭제 불가
+    if (user.name === 'Ann' || user.email === 'ann.88toy@gmail.com' || user.email === 'ann@88toy.co.kr') {
+      alert('Ann 계정은 삭제할 수 없습니다.');
+      return;
+    }
+    
     if (window.confirm(`${user.name} 사용자를 삭제하시겠습니까?`)) {
-      setUsers(users.filter(u => u.id !== user.id));
+      const updatedUsers = users.filter(u => u.id !== user.id);
+      setUsers(updatedUsers);
+      
+      // localStorage 업데이트
+      localStorage.setItem('users', JSON.stringify(updatedUsers));
       
       // 로그 기록
       addChangeLog({
@@ -170,7 +473,19 @@ export default function AdminUsersPage() {
     const updatedUsers = users.map(u => 
       u.id === user.id ? { ...u, status: newStatus } : u
     );
-    setUsers(updatedUsers);
+    
+    // Ann을 첫 번째로 유지
+    const annUser = updatedUsers.find(u => u.name === 'Ann' || u.email === 'ann.88toy@gmail.com' || u.email === 'ann@88toy.co.kr');
+    const otherUsers = updatedUsers.filter(u => u.name !== 'Ann' && u.email !== 'ann.88toy@gmail.com' && u.email !== 'ann@88toy.co.kr');
+    
+    if (annUser) {
+      setUsers([annUser, ...otherUsers]);
+    } else {
+      setUsers(updatedUsers);
+    }
+    
+    // localStorage 업데이트
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
 
     // 로그 기록
     addChangeLog({
@@ -188,13 +503,23 @@ export default function AdminUsersPage() {
     setEditingUser(user);
     setFormData({
       name: user.name,
+      realName: user.realName || '',
       email: user.email,
       role: user.role,
       department: user.department,
+      team: user.team || '',
+      jobTitle: user.jobTitle || '',
+      position: user.position || '',
+      workRole: user.workRole || '',
       phone: user.phone || '',
       status: user.status,
       profileImage: user.profileImage || '',
-      password: user.password || ''
+      password: user.password || '',
+      birthDate: user.birthDate || '',
+      joinDate: user.joinDate || user.createdAt || '',
+      address: user.address || '',
+      mbti: user.mbti || '',
+      resignDate: user.resignDate || ''
     });
     setShowEditModal(true);
   };
@@ -202,13 +527,23 @@ export default function AdminUsersPage() {
   const resetForm = () => {
     setFormData({
       name: '',
+      realName: '',
       email: '',
-      role: 'user',
+      role: '',
       department: '',
+      team: '',
+      jobTitle: '',
+      position: '',
+      workRole: '',
       phone: '',
       status: 'active',
       profileImage: '',
-      password: ''
+      password: '',
+      birthDate: '',
+      joinDate: '',
+      address: '',
+      mbti: '',
+      resignDate: ''
     });
   };
 
@@ -234,18 +569,36 @@ export default function AdminUsersPage() {
   };
 
   const getRoleBadgeColor = (role: string) => {
-    switch(role) {
-      case 'admin': return 'bg-red-100 text-red-800';
-      case 'manager': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
+    const roleNormalized = role.toLowerCase();
+    if (roleNormalized.includes('관리자') || roleNormalized.includes('admin')) {
+      return 'bg-red-100 text-red-800';
+    } else if (roleNormalized.includes('매니저') || roleNormalized.includes('manager')) {
+      return 'bg-blue-100 text-blue-800';
+    } else if (roleNormalized.includes('직원')) {
+      return 'bg-green-100 text-green-800';
+    } else if (roleNormalized.includes('인턴')) {
+      return 'bg-yellow-100 text-yellow-800';
     }
+    return 'bg-gray-100 text-gray-800';
   };
 
-  const getRoleLabel = (role: string) => {
-    switch(role) {
-      case 'admin': return '관리자';
-      case 'manager': return '매니저';
-      default: return '일반사용자';
+  // 만 나이 계산 함수
+  const calculateAge = (birthDate: string) => {
+    if (!birthDate) return '-';
+    try {
+      const birth = new Date(birthDate);
+      const today = new Date();
+      
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+      
+      return age;
+    } catch (error) {
+      return '-';
     }
   };
 
@@ -287,7 +640,7 @@ export default function AdminUsersPage() {
           <div className="card-body">
             <p className="text-sm text-gray-600">관리자</p>
             <p className="text-2xl font-bold text-red-600">
-              {users.filter(u => u.role === 'admin').length}명
+              {users.filter(u => u.role === '관리자').length}명
             </p>
           </div>
         </div>
@@ -310,70 +663,115 @@ export default function AdminUsersPage() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   프로필
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  사용자
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  닉네임/이름
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  역할
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  이메일/MBTI
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  부서
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  부서/팀
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  직급/포지션/업무역할
+                </th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  권한그룹
+                </th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  생년월일
+                </th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  입사일/근무기간
+                </th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  연락처/주소
+                </th>
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   상태
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  마지막 로그인
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  액션
+                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  편집
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {users.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-2 whitespace-nowrap">
                     <div className="flex items-center justify-center">
                       {user.profileImage ? (
                         <img 
                           src={user.profileImage} 
                           alt={user.name}
-                          className="h-10 w-10 rounded-full object-cover"
+                          className="h-8 w-8 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                          <span className="text-gray-600 font-medium text-sm">
+                        <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
+                          <span className="text-gray-600 font-medium text-xs">
                             {user.name.charAt(0).toUpperCase()}
                           </span>
                         </div>
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-2 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                      <div className="text-sm text-gray-500">{user.email}</div>
-                      {user.phone && (
-                        <div className="text-xs text-gray-400">{user.phone}</div>
+                      <div className="text-xs text-gray-500">{user.realName || '-'}</div>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2">
+                    <div className="space-y-1">
+                      <div className="text-sm text-gray-900">{user.email}</div>
+                      <div className="text-xs text-gray-500">{user.mbti || 'MBTI 미등록'}</div>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2 text-sm text-gray-900">
+                    <div className="space-y-1">
+                      <div className="font-medium">{user.department}</div>
+                      <div className="text-xs text-gray-500">{user.team || '팀 미지정'}</div>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2">
+                    <div className="space-y-0.5">
+                      <div className="text-sm font-medium text-gray-900">{user.jobTitle || '직급 미지정'}</div>
+                      <div className="text-xs text-gray-600">{user.position || '포지션 미지정'}</div>
+                      <div className="text-xs text-gray-500">{user.workRole || '업무역할 미지정'}</div>
+                    </div>
+                  </td>
+                  <td className="px-3 py-2 whitespace-nowrap">
+                    <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}>
+                      {user.role}
+                    </span>
+                  </td>
+                  <td className="px-3 py-2 text-xs text-gray-500">
+                    <div className="space-y-1">
+                      <div className="font-medium">{user.birthDate || '-'}</div>
+                      {user.birthDate && (
+                        <div className="text-gray-400">(만 {calculateAge(user.birthDate)}세)</div>
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRoleBadgeColor(user.role)}`}>
-                      {getRoleLabel(user.role)}
-                    </span>
+                  <td className="px-3 py-2 text-xs text-gray-500">
+                    <div className="space-y-1">
+                      <div className="font-medium">{user.joinDate || user.createdAt || '-'}</div>
+                      <div className="text-gray-400">{user.workPeriod || (user.joinDate ? calculateWorkPeriod(user.joinDate) : '-')}</div>
+                    </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {user.department}
+                  <td className="px-3 py-2 text-xs text-gray-500 max-w-40">
+                    <div className="space-y-1">
+                      <div className="font-medium">{user.phone || '연락처 미등록'}</div>
+                      <div className="text-gray-400 truncate" title={user.address}>{user.address || '주소 미등록'}</div>
+                    </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-3 py-2 whitespace-nowrap">
                     <button
                       onClick={() => handleToggleStatus(user)}
-                      className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full transition-colors ${
+                      className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full transition-colors ${
                         user.status === 'active' 
                           ? 'bg-green-100 text-green-800 hover:bg-green-200' 
                           : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
@@ -382,33 +780,79 @@ export default function AdminUsersPage() {
                       {user.status === 'active' ? '활성' : '비활성'}
                     </button>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {user.lastLogin || '-'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => openEditModal(user)}
-                      className="text-blue-600 hover:text-blue-900 mr-3"
-                    >
-                      수정
-                    </button>
-                    <button
-                      onClick={() => handlePasswordReset(user)}
-                      className="text-purple-600 hover:text-purple-900 mr-3"
-                    >
-                      비밀번호 초기화
-                    </button>
-                    <button
-                      onClick={() => handleDeleteUser(user)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      삭제
-                    </button>
+                  <td className="px-3 py-2 whitespace-nowrap text-sm font-medium">
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => openEditModal(user)}
+                        className="text-blue-600 hover:text-blue-900 text-xs"
+                      >
+                        수정
+                      </button>
+                      <span className="text-gray-400">|</span>
+                      <button
+                        onClick={() => handleDeleteUser(user)}
+                        className="text-red-600 hover:text-red-900 text-xs"
+                      >
+                        삭제
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      {/* 마지막 로그인 정보 카드 */}
+      <div className="card">
+        <div className="card-header">
+          <h3 className="card-title">최근 로그인 현황</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
+            {users.map((user) => (
+              <div key={user.id} className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0">
+                    {user.profileImage ? (
+                      <img 
+                        src={user.profileImage} 
+                        alt={user.name}
+                        className="h-10 w-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                        <span className="text-gray-600 font-medium text-sm">
+                          {user.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-gray-900 truncate">
+                      {user.name}
+                    </div>
+                    <div className="text-xs text-gray-500 truncate">
+                      {user.email}
+                    </div>
+                    <div className="flex items-center mt-1">
+                      <div className={`inline-flex items-center px-1.5 py-0.5 text-xs font-medium rounded-full ${
+                        user.lastLogin 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        <div className={`w-1.5 h-1.5 rounded-full mr-1 ${
+                          user.lastLogin ? 'bg-green-400' : 'bg-gray-400'
+                        }`}></div>
+                        {user.lastLogin || '로그인 기록 없음'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -474,17 +918,32 @@ export default function AdminUsersPage() {
                       <p className="mt-1 text-xs text-gray-500">JPG, PNG 형식의 5MB 이하 이미지</p>
                     </div>
                     
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        이름 <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          닉네임 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="표시될 이름"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          실제 이름
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.realName}
+                          onChange={(e) => setFormData({ ...formData, realName: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="실제 이름"
+                        />
+                      </div>
                     </div>
 
                     <div>
@@ -515,34 +974,199 @@ export default function AdminUsersPage() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        역할 <span className="text-red-500">*</span>
+                        권한그룹 <span className="text-red-500">*</span>
                       </label>
                       <select
                         value={formData.role}
-                        onChange={(e) => setFormData({ ...formData, role: e.target.value as 'admin' | 'manager' | 'user' })}
+                        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       >
-                        <option value="user">일반사용자</option>
-                        <option value="manager">매니저</option>
-                        <option value="admin">관리자</option>
+                        <option value="">권한그룹 선택</option>
+                        {systemRoles.length > 0 ? (
+                          systemRoles.map(role => (
+                            <option key={role.id} value={role.name}>
+                              {role.name} - {role.description}
+                            </option>
+                          ))
+                        ) : (
+                          <>
+                            <option value="일반사용자">일반사용자</option>
+                            <option value="매니저">매니저</option>
+                            <option value="관리자">관리자</option>
+                          </>
+                        )}
                       </select>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          부서 <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={formData.department}
+                          onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          required
+                        >
+                          <option value="">부서 선택</option>
+                          {systemDepartments.length > 0 ? (
+                            systemDepartments.map(dept => (
+                              <option key={dept.id} value={dept.name}>{dept.name}</option>
+                            ))
+                          ) : (
+                            <option value="" disabled>기초등록에서 부서를 설정해주세요</option>
+                          )}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          팀
+                        </label>
+                        <select
+                          value={formData.team}
+                          onChange={(e) => setFormData({ ...formData, team: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="">팀 선택</option>
+                          {formData.department ? (
+                            systemTeams
+                              .filter(team => {
+                                const dept = systemDepartments.find(d => d.name === formData.department);
+                                return dept && team.parentId === dept.id;
+                              })
+                              .map(team => (
+                                <option key={team.id} value={team.name}>{team.name}</option>
+                              ))
+                          ) : (
+                            <option value="" disabled>부서를 먼저 선택해주세요</option>
+                          )}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          직급
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.jobTitle}
+                          onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
+                          placeholder="예: 대리, 과장"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          포지션
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.position}
+                          onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                          placeholder="예: PM, Designer"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        업무역할
+                      </label>
+                      <textarea
+                        value={formData.workRole}
+                        onChange={(e) => setFormData({ ...formData, workRole: e.target.value })}
+                        placeholder="담당하는 주요 업무를 입력하세요"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        rows={2}
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          생년월일
+                        </label>
+                        <input
+                          type="date"
+                          value={formData.birthDate}
+                          onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          입사일
+                        </label>
+                        <input
+                          type="date"
+                          value={formData.joinDate}
+                          onChange={(e) => setFormData({ ...formData, joinDate: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        부서 <span className="text-red-500">*</span>
+                        주소
                       </label>
-                      <select
-                        value={formData.department}
-                        onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                      <textarea
+                        value={formData.address}
+                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                        placeholder="주소를 입력하세요"
+                        rows={2}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      >
-                        <option value="">부서 선택</option>
-                        {departments.map(dept => (
-                          <option key={dept} value={dept}>{dept}</option>
-                        ))}
-                      </select>
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          MBTI
+                        </label>
+                        <select
+                          value={formData.mbti}
+                          onChange={(e) => setFormData({ ...formData, mbti: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="">선택하세요</option>
+                          <option value="INTJ">INTJ</option>
+                          <option value="INTP">INTP</option>
+                          <option value="ENTJ">ENTJ</option>
+                          <option value="ENTP">ENTP</option>
+                          <option value="INFJ">INFJ</option>
+                          <option value="INFP">INFP</option>
+                          <option value="ENFJ">ENFJ</option>
+                          <option value="ENFP">ENFP</option>
+                          <option value="ISTJ">ISTJ</option>
+                          <option value="ISFJ">ISFJ</option>
+                          <option value="ESTJ">ESTJ</option>
+                          <option value="ESFJ">ESFJ</option>
+                          <option value="ISTP">ISTP</option>
+                          <option value="ISFP">ISFP</option>
+                          <option value="ESTP">ESTP</option>
+                          <option value="ESFP">ESFP</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          퇴사일
+                        </label>
+                        <input
+                          type="date"
+                          value={formData.resignDate}
+                          onChange={(e) => setFormData({ ...formData, resignDate: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
                     </div>
                     
                     <div>
@@ -648,17 +1272,32 @@ export default function AdminUsersPage() {
                       <p className="mt-1 text-xs text-gray-500">JPG, PNG 형식의 5MB 이하 이미지</p>
                     </div>
                     
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        이름 <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          닉네임 <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="표시될 이름"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          실제 이름
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.realName}
+                          onChange={(e) => setFormData({ ...formData, realName: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="실제 이름"
+                        />
+                      </div>
                     </div>
 
                     <div>
@@ -689,34 +1328,104 @@ export default function AdminUsersPage() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        역할 <span className="text-red-500">*</span>
+                        권한그룹 <span className="text-red-500">*</span>
                       </label>
                       <select
                         value={formData.role}
-                        onChange={(e) => setFormData({ ...formData, role: e.target.value as 'admin' | 'manager' | 'user' })}
+                        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       >
-                        <option value="user">일반사용자</option>
-                        <option value="manager">매니저</option>
-                        <option value="admin">관리자</option>
+                        <option value="">권한그룹 선택</option>
+                        {systemRoles.length > 0 ? (
+                          systemRoles.map(role => (
+                            <option key={role.id} value={role.name}>
+                              {role.name} - {role.description}
+                            </option>
+                          ))
+                        ) : (
+                          <>
+                            <option value="일반사용자">일반사용자</option>
+                            <option value="매니저">매니저</option>
+                            <option value="관리자">관리자</option>
+                          </>
+                        )}
                       </select>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        부서 <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        value={formData.department}
-                        onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        required
-                      >
-                        <option value="">부서 선택</option>
-                        {departments.map(dept => (
-                          <option key={dept} value={dept}>{dept}</option>
-                        ))}
-                      </select>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          부서 <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={formData.department}
+                          onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                          required
+                        >
+                          <option value="">부서 선택</option>
+                          {systemDepartments.length > 0 ? (
+                            systemDepartments.map(dept => (
+                              <option key={dept.id} value={dept.name}>{dept.name}</option>
+                            ))
+                          ) : (
+                            <option value="" disabled>기초등록에서 부서를 설정해주세요</option>
+                          )}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          팀
+                        </label>
+                        <select
+                          value={formData.team}
+                          onChange={(e) => setFormData({ ...formData, team: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="">팀 선택</option>
+                          {formData.department ? (
+                            systemTeams
+                              .filter(team => {
+                                const dept = systemDepartments.find(d => d.name === formData.department);
+                                return dept && team.parentId === dept.id;
+                              })
+                              .map(team => (
+                                <option key={team.id} value={team.name}>{team.name}</option>
+                              ))
+                          ) : (
+                            <option value="" disabled>부서를 먼저 선택해주세요</option>
+                          )}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          직급
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.jobTitle}
+                          onChange={(e) => setFormData({ ...formData, jobTitle: e.target.value })}
+                          placeholder="예: 대리, 과장"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          포지션
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.position}
+                          onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                          placeholder="예: PM, Designer"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
                     </div>
 
                     <div>
@@ -731,6 +1440,88 @@ export default function AdminUsersPage() {
                         <option value="active">활성</option>
                         <option value="inactive">비활성</option>
                       </select>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          생년월일
+                        </label>
+                        <input
+                          type="date"
+                          value={formData.birthDate}
+                          onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          입사일
+                        </label>
+                        <input
+                          type="date"
+                          value={formData.joinDate}
+                          onChange={(e) => setFormData({ ...formData, joinDate: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        주소
+                      </label>
+                      <textarea
+                        value={formData.address}
+                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                        placeholder="주소를 입력하세요"
+                        rows={2}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          MBTI
+                        </label>
+                        <select
+                          value={formData.mbti}
+                          onChange={(e) => setFormData({ ...formData, mbti: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="">선택하세요</option>
+                          <option value="INTJ">INTJ</option>
+                          <option value="INTP">INTP</option>
+                          <option value="ENTJ">ENTJ</option>
+                          <option value="ENTP">ENTP</option>
+                          <option value="INFJ">INFJ</option>
+                          <option value="INFP">INFP</option>
+                          <option value="ENFJ">ENFJ</option>
+                          <option value="ENFP">ENFP</option>
+                          <option value="ISTJ">ISTJ</option>
+                          <option value="ISFJ">ISFJ</option>
+                          <option value="ESTJ">ESTJ</option>
+                          <option value="ESFJ">ESFJ</option>
+                          <option value="ISTP">ISTP</option>
+                          <option value="ISFP">ISFP</option>
+                          <option value="ESTP">ESTP</option>
+                          <option value="ESFP">ESFP</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          퇴사일
+                        </label>
+                        <input
+                          type="date"
+                          value={formData.resignDate}
+                          onChange={(e) => setFormData({ ...formData, resignDate: e.target.value })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>

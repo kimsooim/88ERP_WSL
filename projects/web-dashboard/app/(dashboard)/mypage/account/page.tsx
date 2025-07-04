@@ -11,13 +11,23 @@ export default function MyAccountPage() {
   // 개인정보 편집 폼
   const [profileForm, setProfileForm] = useState({
     name: '',
+    realName: '',
     email: '',
     department: '',
+    team: '',
+    jobTitle: '',
+    position: '',
+    workRole: '',
     phone: '',
     address: '',
     profileImage: '',
     joinDate: '',
-    birthDate: ''
+    birthDate: '',
+    role: '',
+    status: 'active' as const,
+    mbti: '',
+    resignDate: '',
+    resignReason: ''
   });
   const [isEditing, setIsEditing] = useState(false);
   const [profileUpdateSuccess, setProfileUpdateSuccess] = useState(false);
@@ -25,25 +35,30 @@ export default function MyAccountPage() {
 
   // 근무 기간 계산 함수
   const calculateWorkPeriod = (joinDate: string) => {
-    const join = new Date(joinDate);
-    const today = new Date();
-    
-    let years = today.getFullYear() - join.getFullYear();
-    let months = today.getMonth() - join.getMonth();
-    let days = today.getDate() - join.getDate();
-    
-    if (days < 0) {
-      months--;
-      const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-      days += lastMonth.getDate();
+    try {
+      const join = new Date(joinDate);
+      const today = new Date();
+      
+      let years = today.getFullYear() - join.getFullYear();
+      let months = today.getMonth() - join.getMonth();
+      let days = today.getDate() - join.getDate();
+      
+      if (days < 0) {
+        months--;
+        const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+        days += lastMonth.getDate();
+      }
+      
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+      
+      return { years, months, days };
+    } catch (error) {
+      console.error('Error calculating work period:', error);
+      return { years: 0, months: 0, days: 0 };
     }
-    
-    if (months < 0) {
-      years--;
-      months += 12;
-    }
-    
-    return { years, months, days };
   };
 
   // 만 나이 계산 함수
@@ -61,42 +76,127 @@ export default function MyAccountPage() {
     return age;
   };
 
-  // 사용자 정보로 폼 초기화
+  // 사용자 정보로 폼 초기화 및 실시간 동기화
   useEffect(() => {
-    if (user) {
-      // localStorage에서 추가 정보 불러오기
-      const savedAdditionalInfo = localStorage.getItem('userAdditionalInfo');
-      let additionalInfo = {
-        phone: '',
-        address: '',
-        birthDate: '1990-01-01',
-        joinDate: '2024-01-01'
-      };
-      
-      if (savedAdditionalInfo) {
-        try {
-          additionalInfo = JSON.parse(savedAdditionalInfo);
-        } catch (e) {
-          console.error('추가 정보 로드 실패:', e);
+    const loadUserData = () => {
+      if (user) {
+        // 먼저 users 데이터에서 현재 사용자 정보 확인
+        const savedUsers = localStorage.getItem('users');
+        let userFromManagement = null;
+        
+        if (savedUsers) {
+          try {
+            const users = JSON.parse(savedUsers);
+            userFromManagement = users.find((u: any) => u.email === user.email);
+          } catch (e) {
+            console.error('사용자 관리 데이터 로드 실패:', e);
+          }
+        }
+
+        // 사용자관리 데이터가 있으면 그것을 우선 사용
+        if (userFromManagement) {
+          const formData = {
+            name: userFromManagement.name || user.name || '',
+            realName: userFromManagement.realName || '',
+            email: userFromManagement.email || user.email || '',
+            department: userFromManagement.department || user.department || '',
+            team: userFromManagement.team || '',
+            jobTitle: userFromManagement.jobTitle || '',
+            position: userFromManagement.position || '',
+            workRole: userFromManagement.workRole || '',
+            phone: userFromManagement.phone || '',
+            address: userFromManagement.address || '',
+            profileImage: userFromManagement.profileImage || user.profileImage || '',
+            joinDate: userFromManagement.joinDate || userFromManagement.createdAt || '2024-01-01',
+            birthDate: userFromManagement.birthDate || '1990-01-01',
+            role: userFromManagement.role || user.role || '일반사용자',
+            status: userFromManagement.status || 'active',
+            mbti: userFromManagement.mbti || '',
+            resignDate: userFromManagement.resignDate || '',
+            resignReason: userFromManagement.resignReason || ''
+          };
+          
+          setProfileForm(formData);
+        } else {
+          // localStorage에서 추가 정보 불러오기
+          const savedAdditionalInfo = localStorage.getItem('userAdditionalInfo');
+          let additionalInfo = {
+            phone: '',
+            address: '',
+            birthDate: '1990-01-01',
+            joinDate: user.createdAt || '2024-01-01'
+          };
+          
+          if (savedAdditionalInfo) {
+            try {
+              additionalInfo = JSON.parse(savedAdditionalInfo);
+            } catch (e) {
+              console.error('추가 정보 로드 실패:', e);
+            }
+          }
+          
+          const formData = {
+            name: user.name || '',
+            realName: '',
+            email: user.email || '',
+            department: user.department || '',
+            team: '',
+            jobTitle: '',
+            position: '',
+            phone: additionalInfo.phone,
+            address: additionalInfo.address,
+            profileImage: user.profileImage || '',
+            joinDate: additionalInfo.joinDate,
+            birthDate: additionalInfo.birthDate,
+            role: user.role || '일반사용자',
+            status: 'active' as const,
+            mbti: '',
+            resignDate: '',
+            resignReason: ''
+          };
+          
+          setProfileForm(formData);
         }
       }
-      
-      const formData = {
-        name: user.name || '',
-        email: user.email || '',
-        department: user.department || '',
-        phone: additionalInfo.phone || '',
-        address: additionalInfo.address || '',
-        profileImage: user.profileImage || '',
-        joinDate: additionalInfo.joinDate || user.createdAt || '2024-01-01',
-        birthDate: additionalInfo.birthDate || '1990-01-01'
-      };
-      
-      console.log('Setting profileForm with joinDate:', formData.joinDate);
-      console.log('user.createdAt:', user.createdAt);
-      console.log('additionalInfo.joinDate:', additionalInfo.joinDate);
-      setProfileForm(formData);
-    }
+    };
+
+    loadUserData();
+
+    // 사용자관리에서 데이터가 업데이트되었을 때 실시간 동기화
+    const handleUserDataUpdate = (event: CustomEvent) => {
+      if (event.detail.updatedUsers && user) {
+        const updatedUser = event.detail.updatedUsers.find((u: any) => u.email === user.email);
+        if (updatedUser) {
+          const formData = {
+            name: updatedUser.name || '',
+            realName: updatedUser.realName || '',
+            email: updatedUser.email || '',
+            department: updatedUser.department || '',
+            team: updatedUser.team || '',
+            jobTitle: updatedUser.jobTitle || '',
+            position: updatedUser.position || '',
+            phone: updatedUser.phone || '',
+            address: updatedUser.address || '',
+            profileImage: updatedUser.profileImage || '',
+            joinDate: updatedUser.joinDate || updatedUser.createdAt || '2024-01-01',
+            birthDate: updatedUser.birthDate || '1990-01-01',
+            role: updatedUser.role || '일반사용자',
+            status: updatedUser.status || 'active' as const,
+            mbti: updatedUser.mbti || '',
+            resignDate: updatedUser.resignDate || '',
+            resignReason: updatedUser.resignReason || '',
+            workRole: updatedUser.workRole || ''
+          };
+          setProfileForm(formData);
+        }
+      }
+    };
+
+    window.addEventListener('userDataUpdated', handleUserDataUpdate as EventListener);
+
+    return () => {
+      window.removeEventListener('userDataUpdated', handleUserDataUpdate as EventListener);
+    };
   }, [user]);
 
   // 프로필 이미지를 Base64로 변환하는 함수
@@ -131,6 +231,59 @@ export default function MyAccountPage() {
     }
   };
 
+  // 사용자관리와 동기화하는 함수
+  const syncWithUserManagement = (updatedData: any) => {
+    try {
+      const savedUsers = localStorage.getItem('users');
+      if (savedUsers && user) {
+        const users = JSON.parse(savedUsers);
+        const updatedUsers = users.map((u: any) => {
+          // 현재 로그인한 사용자와 일치하는 경우 업데이트
+          if (u.email === user.email || 
+              (user.name === 'Ann' && (u.name === 'Ann' || u.email === 'ann.88toy@gmail.com' || u.email === 'ann@88toy.co.kr'))) {
+            return { 
+              ...u, 
+              name: updatedData.name || u.name,
+              realName: profileForm.realName || u.realName,
+              email: updatedData.email || u.email,
+              department: updatedData.department || u.department,
+              team: profileForm.team || u.team,
+              jobTitle: profileForm.jobTitle || u.jobTitle,
+              position: profileForm.position || u.position,
+              workRole: profileForm.workRole || u.workRole,
+              profileImage: updatedData.profileImage !== undefined ? updatedData.profileImage : u.profileImage,
+              phone: profileForm.phone,
+              address: profileForm.address,
+              birthDate: profileForm.birthDate,
+              joinDate: profileForm.joinDate,
+              role: profileForm.role || u.role,
+              status: profileForm.status || u.status,
+              workPeriod: profileForm.joinDate ? (() => {
+                const period = calculateWorkPeriod(profileForm.joinDate);
+                return `${period.years}년 ${period.months}개월 ${period.days}일`;
+              })() : u.workPeriod,
+              mbti: profileForm.mbti || u.mbti,
+              resignDate: profileForm.resignDate || u.resignDate
+            };
+          }
+          return u;
+        });
+        
+        localStorage.setItem('users', JSON.stringify(updatedUsers));
+        
+        // 사용자관리 페이지에 업데이트 이벤트 전송
+        window.dispatchEvent(new CustomEvent('userDataUpdated', {
+          detail: { updatedUsers }
+        }));
+
+        // 로그 추가
+        console.log('마이페이지에서 사용자 정보 동기화 완료:', updatedData);
+      }
+    } catch (error) {
+      console.error('사용자관리 동기화 오류:', error);
+    }
+  };
+
   // 개인정보 저장 핸들러
   const handleProfileSave = async () => {
     if (!user) return;
@@ -149,6 +302,9 @@ export default function MyAccountPage() {
       const success = await updateUserProfile(userProfile);
       
       if (success) {
+        // 사용자관리와 동기화
+        syncWithUserManagement(userProfile);
+        
         setIsEditing(false);
         setProfileUpdateSuccess(true);
         setTimeout(() => setProfileUpdateSuccess(false), 3000);
@@ -193,18 +349,27 @@ export default function MyAccountPage() {
       
       setProfileForm({
         name: user.name || '',
+        realName: '',
         email: user.email || '',
         department: user.department || '',
+        team: '',
+        jobTitle: '',
+        position: '',
+        workRole: '',
         phone: additionalInfo.phone || '',
         address: additionalInfo.address || '',
         profileImage: user.profileImage || '',
         joinDate: additionalInfo.joinDate || user.createdAt || '2024-01-01',
-        birthDate: additionalInfo.birthDate || '1990-01-01'
+        birthDate: additionalInfo.birthDate || '1990-01-01',
+        role: user.role || '일반사용자',
+        status: 'active' as const,
+        mbti: '',
+        resignDate: '',
+        resignReason: ''
       });
     }
     setIsEditing(false);
   };
-
 
   if (!user) {
     return (
@@ -217,8 +382,8 @@ export default function MyAccountPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">계정 설정</h1>
-        <p className="text-gray-600 mt-1">프로필 정보와 보안 설정을 관리하세요</p>
+        <h1 className="text-2xl font-bold text-gray-900">계정관리</h1>
+        <p className="text-gray-600 mt-1">프로필 정보와 계정 설정을 관리하세요</p>
       </div>
 
       {/* 프로필 업데이트 성공 메시지 */}
@@ -333,75 +498,205 @@ export default function MyAccountPage() {
             </div>
             <div className="card-body">
               {isEditing ? (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
-                      <input
-                        type="text"
-                        value={profileForm.name}
-                        onChange={(e) => setProfileForm(prev => ({ ...prev, name: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">이메일</label>
-                      <input
-                        type="email"
-                        value={profileForm.email}
-                        onChange={(e) => setProfileForm(prev => ({ ...prev, email: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">부서</label>
-                      <input
-                        type="text"
-                        value={profileForm.department}
-                        onChange={(e) => setProfileForm(prev => ({ ...prev, department: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">전화번호</label>
-                      <input
-                        type="tel"
-                        value={profileForm.phone}
-                        onChange={(e) => setProfileForm(prev => ({ ...prev, phone: e.target.value }))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="010-0000-0000"
-                      />
-                    </div>
-                  </div>
+                <div className="space-y-6">
+                  {/* 기본 정보 섹션 */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">생년월일</label>
-                    <input
-                      type="date"
-                      value={profileForm.birthDate}
-                      onChange={(e) => setProfileForm(prev => ({ ...prev, birthDate: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
+                    <h4 className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">기본 정보</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">닉네임</label>
+                        <input
+                          type="text"
+                          value={profileForm.name}
+                          onChange={(e) => setProfileForm(prev => ({ ...prev, name: e.target.value }))}
+                          placeholder="표시될 이름"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">실제 이름</label>
+                        <input
+                          type="text"
+                          value={profileForm.realName}
+                          onChange={(e) => setProfileForm(prev => ({ ...prev, realName: e.target.value }))}
+                          placeholder="실제 이름"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">이메일</label>
+                        <input
+                          type="email"
+                          value={profileForm.email}
+                          onChange={(e) => setProfileForm(prev => ({ ...prev, email: e.target.value }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">전화번호</label>
+                        <input
+                          type="tel"
+                          value={profileForm.phone}
+                          onChange={(e) => setProfileForm(prev => ({ ...prev, phone: e.target.value }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="010-0000-0000"
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">주소</label>
+                        <input
+                          type="text"
+                          value={profileForm.address}
+                          onChange={(e) => setProfileForm(prev => ({ ...prev, address: e.target.value }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="주소를 입력하세요"
+                        />
+                      </div>
+                    </div>
                   </div>
+
+                  {/* 인사 정보 섹션 */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">입사일</label>
-                    <input
-                      type="date"
-                      value={profileForm.joinDate}
-                      onChange={(e) => setProfileForm(prev => ({ ...prev, joinDate: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
+                    <h4 className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">인사 정보</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">생년월일</label>
+                        <input
+                          type="date"
+                          value={profileForm.birthDate}
+                          onChange={(e) => setProfileForm(prev => ({ ...prev, birthDate: e.target.value }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">입사일</label>
+                        <input
+                          type="date"
+                          value={profileForm.joinDate}
+                          onChange={(e) => setProfileForm(prev => ({ ...prev, joinDate: e.target.value }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">MBTI</label>
+                        <select
+                          value={profileForm.mbti}
+                          onChange={(e) => setProfileForm(prev => ({ ...prev, mbti: e.target.value }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="">선택하세요</option>
+                          <option value="INTJ">INTJ</option>
+                          <option value="INTP">INTP</option>
+                          <option value="ENTJ">ENTJ</option>
+                          <option value="ENTP">ENTP</option>
+                          <option value="INFJ">INFJ</option>
+                          <option value="INFP">INFP</option>
+                          <option value="ENFJ">ENFJ</option>
+                          <option value="ENFP">ENFP</option>
+                          <option value="ISTJ">ISTJ</option>
+                          <option value="ISFJ">ISFJ</option>
+                          <option value="ESTJ">ESTJ</option>
+                          <option value="ESFJ">ESFJ</option>
+                          <option value="ISTP">ISTP</option>
+                          <option value="ISFP">ISFP</option>
+                          <option value="ESTP">ESTP</option>
+                          <option value="ESFP">ESFP</option>
+                        </select>
+                      </div>
+                    </div>
                   </div>
+
+                  {/* 조직 정보 섹션 */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">주소</label>
-                    <textarea
-                      value={profileForm.address}
-                      onChange={(e) => setProfileForm(prev => ({ ...prev, address: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      rows={2}
-                      placeholder="주소를 입력하세요"
-                    />
+                    <h4 className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">조직 정보</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">부서</label>
+                        <input
+                          type="text"
+                          value={profileForm.department}
+                          disabled
+                          className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">팀</label>
+                        <input
+                          type="text"
+                          value={profileForm.team}
+                          disabled
+                          className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">역할</label>
+                        <input
+                          type="text"
+                          value={profileForm.role}
+                          disabled
+                          className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">직급</label>
+                        <input
+                          type="text"
+                          value={profileForm.jobTitle}
+                          disabled
+                          className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">포지션</label>
+                        <input
+                          type="text"
+                          value={profileForm.position}
+                          disabled
+                          className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">상태</label>
+                        <input
+                          type="text"
+                          value={profileForm.status === 'active' ? '활성' : '비활성'}
+                          disabled
+                          className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">퇴사일</label>
+                        <input
+                          type="date"
+                          value={profileForm.resignDate}
+                          disabled
+                          className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500"
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">퇴사사유</label>
+                        <input
+                          type="text"
+                          value={profileForm.resignReason}
+                          disabled
+                          className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500"
+                          placeholder="퇴사 시 관리자가 입력"
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">업무역할</label>
+                      <textarea
+                        value={profileForm.workRole}
+                        onChange={(e) => setProfileForm(prev => ({ ...prev, workRole: e.target.value }))}
+                        placeholder="담당하는 주요 업무를 입력하세요"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        rows={2}
+                      />
+                    </div>
                   </div>
-                  <div className="flex justify-end gap-2 pt-2">
+
+                  <div className="flex justify-end gap-2 pt-4 border-t border-gray-200">
                     <button
                       onClick={handleEditCancel}
                       className="px-4 py-2 text-sm font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors"
@@ -417,45 +712,130 @@ export default function MyAccountPage() {
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-6">
+                  {/* 기본 정보 섹션 */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-1">이름</label>
-                    <p className="text-sm text-gray-900">{user.name}</p>
+                    <h4 className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">기본 정보</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500 mb-1">닉네임</label>
+                        <p className="text-sm text-gray-900">{user.name}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500 mb-1">실제 이름</label>
+                        <p className="text-sm text-gray-900">{profileForm.realName || '-'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500 mb-1">이메일</label>
+                        <p className="text-sm text-gray-900">{user.email}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500 mb-1">전화번호</label>
+                        <p className="text-sm text-gray-900">{profileForm.phone || '미등록'}</p>
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className="block text-sm font-medium text-gray-500 mb-1">주소</label>
+                        <p className="text-sm text-gray-900">{profileForm.address || '미등록'}</p>
+                      </div>
+                    </div>
                   </div>
+
+                  {/* 인사 정보 섹션 */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-1">이메일</label>
-                    <p className="text-sm text-gray-900">{user.email}</p>
+                    <h4 className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">인사 정보</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500 mb-1">생년월일</label>
+                        <p className="text-sm text-gray-900">
+                          {profileForm.birthDate ? (
+                            <>
+                              {profileForm.birthDate}
+                              <span className="text-gray-500 ml-2">(만 {calculateAge(profileForm.birthDate)}세)</span>
+                            </>
+                          ) : '미등록'}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500 mb-1">입사일</label>
+                        <p className="text-sm text-gray-900">{profileForm.joinDate || '미등록'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500 mb-1">근무 기간</label>
+                        <p className="text-sm text-gray-900">
+                          {profileForm.joinDate ? (() => {
+                            const period = calculateWorkPeriod(profileForm.joinDate);
+                            return `${period.years}년 ${period.months}개월 ${period.days}일`;
+                          })() : '-'}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500 mb-1">MBTI</label>
+                        <p className="text-sm text-gray-900">{profileForm.mbti || '미등록'}</p>
+                      </div>
+                    </div>
                   </div>
+
+                  {/* 조직 정보 섹션 */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-1">부서</label>
-                    <p className="text-sm text-gray-900">{user.department}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-1">전화번호</label>
-                    <p className="text-sm text-gray-900">{profileForm.phone || '미등록'}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-1">생년월일</label>
-                    <p className="text-sm text-gray-900">
-                      {profileForm.birthDate} (만 {calculateAge(profileForm.birthDate)}세)
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-1">입사일</label>
-                    <p className="text-sm text-gray-900">{profileForm.joinDate}</p>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-500 mb-1">근무 기간</label>
-                    <p className="text-sm text-gray-900">
-                      {profileForm.joinDate ? (() => {
-                        const period = calculateWorkPeriod(profileForm.joinDate);
-                        return `${period.years}년 ${period.months}개월 ${period.days}일`;
-                      })() : '계산 중...'}
-                    </p>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium text-gray-500 mb-1">주소</label>
-                    <p className="text-sm text-gray-900">{profileForm.address || '미등록'}</p>
+                    <h4 className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-100">조직 정보</h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500 mb-1">부서</label>
+                        <p className="text-sm text-gray-900">{profileForm.department || user.department || '미지정'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500 mb-1">팀</label>
+                        <p className="text-sm text-gray-900">{profileForm.team || '팀 미지정'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500 mb-1">역할</label>
+                        <p className="text-sm text-gray-900">
+                          <span className={`inline-flex px-2.5 py-0.5 text-xs font-medium rounded-full ${
+                            profileForm.role === '관리자' ? 'bg-red-100 text-red-800' :
+                            profileForm.role === '매니저' ? 'bg-blue-100 text-blue-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {profileForm.role || '일반사용자'}
+                          </span>
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500 mb-1">직급</label>
+                        <p className="text-sm text-gray-900">{profileForm.jobTitle || '직급 미지정'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500 mb-1">포지션</label>
+                        <p className="text-sm text-gray-900">{profileForm.position || '포지션 미지정'}</p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-500 mb-1">상태</label>
+                        <p className="text-sm text-gray-900">
+                          <span className={`inline-flex px-2.5 py-0.5 text-xs font-medium rounded-full ${
+                            profileForm.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {profileForm.status === 'active' ? '활성' : '비활성'}
+                          </span>
+                        </p>
+                      </div>
+                      {profileForm.resignDate && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-500 mb-1">퇴사일</label>
+                          <p className="text-sm text-gray-900">{profileForm.resignDate}</p>
+                        </div>
+                      )}
+                      {profileForm.resignReason && (
+                        <div className="sm:col-span-2">
+                          <label className="block text-sm font-medium text-gray-500 mb-1">퇴사사유</label>
+                          <p className="text-sm text-gray-900">{profileForm.resignReason}</p>
+                        </div>
+                      )}
+                    </div>
+                    {profileForm.workRole && (
+                      <div className="mt-4">
+                        <label className="block text-sm font-medium text-gray-500 mb-1">업무역할</label>
+                        <p className="text-sm text-gray-900 whitespace-pre-wrap">{profileForm.workRole}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
