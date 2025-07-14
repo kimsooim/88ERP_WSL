@@ -72,7 +72,7 @@ async function executeDeployment() {
     },
     {
       name: 'deploy-to-server',
-      command: `ssh root@183.102.56.171 'cd /root/88ERP && git pull origin main && docker-compose down && docker-compose up -d --build'`,
+      command: `ssh -i ~/.ssh/88erp_deploy_key -o StrictHostKeyChecking=no server@183.102.56.171 '/home/server/SERVER/scripts/deploy-receiver.sh'`,
       message: '운영 서버에 배포 중...',
     },
     {
@@ -82,12 +82,12 @@ async function executeDeployment() {
     },
     {
       name: 'health-check',
-      command: 'curl -f http://db.88toy.co.kr/api/health || curl -f http://183.102.56.171/api/health',
+      command: 'curl -f https://db.88toy.co.kr/api/health',
       message: '운영 서버 헬스체크 중...',
     },
     {
       name: 'verify-deployment',
-      command: `ssh root@183.102.56.171 'docker ps | grep 88erp'`,
+      command: `ssh -i ~/.ssh/88erp_deploy_key -o StrictHostKeyChecking=no server@183.102.56.171 'docker ps | grep 88erp'`,
       message: '배포 상태 확인 중...',
     },
   ];

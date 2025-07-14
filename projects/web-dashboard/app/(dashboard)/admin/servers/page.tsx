@@ -184,106 +184,141 @@ export default function AdminServersPage() {
         <p className="text-gray-600 mt-1">서버 상태를 관리하고 배포를 실행합니다</p>
       </div>
 
-      {/* 서버 상태 카드 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 개발 서버 */}
-        <div className="space-y-4">
-          <div className="card">
-            <div className="card-header">
-              <h3 className="card-title flex items-center gap-2">
-                <FiServer /> 개발 서버
-              </h3>
-            </div>
-            <div className="p-4 space-y-2">
-              <p className="text-sm text-gray-600">호스트: localhost (WSL)</p>
-              <p className="text-sm text-gray-600">브랜치: main</p>
-              <p className="text-sm text-gray-600">저장소: 88ERP_WSL</p>
-              <div className="flex items-center gap-2 mt-2">
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                <span className="text-sm text-green-600">정상 작동중</span>
-              </div>
-            </div>
+      {/* 서버 상태 카드 - 3열 */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* 개발 서버 정보 */}
+        <div className="card">
+          <div className="card-header">
+            <h3 className="card-title flex items-center gap-2">
+              <FiServer /> 개발 서버
+            </h3>
           </div>
-
-          {/* 개발 서버 컨테이너 목록 */}
-          <div className="card">
-            <div className="card-header">
-              <h4 className="text-sm font-medium flex items-center gap-2">
-                <SiDocker /> Docker 컨테이너
-              </h4>
-            </div>
-            <div className="p-4">
-              <div className="space-y-2">
-                {devContainers.map((container) => (
-                  <div key={container.name} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      {container.icon}
-                      <span className="font-mono">{container.name}</span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-gray-500">:{container.ports}</span>
-                      <span className={`text-xs px-2 py-1 rounded ${
-                        container.status === 'running' 
-                          ? 'bg-green-100 text-green-700' 
-                          : 'bg-yellow-100 text-yellow-700'
-                      }`}>
-                        {container.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          <div className="p-4 space-y-2">
+            <p className="text-sm font-semibold text-gray-800">컴퓨터: sp1</p>
+            <p className="text-xs text-gray-500 mb-2">Windows Desktop</p>
+            <p className="text-sm text-gray-600">호스트: localhost (WSL)</p>
+            <p className="text-sm text-gray-600">브랜치: main</p>
+            <p className="text-sm text-gray-600">저장소: 88ERP_WSL</p>
+            <div className="flex items-center gap-2 mt-2">
+              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+              <span className="text-sm text-green-600">정상 작동중</span>
             </div>
           </div>
         </div>
 
-        {/* 운영 서버 */}
-        <div className="space-y-4">
-          <div className="card">
-            <div className="card-header">
-              <h3 className="card-title flex items-center gap-2">
-                <FiServer /> 운영 서버
-              </h3>
-            </div>
-            <div className="p-4 space-y-2">
-              <p className="text-sm text-gray-600">호스트: 183.102.56.171</p>
-              <p className="text-sm text-gray-600">도메인: db.88toy.co.kr</p>
-              <p className="text-sm text-gray-600">저장소: 88ERP_server</p>
-              <div className="flex items-center gap-2 mt-2">
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                <span className="text-sm text-green-600">정상 작동중</span>
-              </div>
+        {/* 운영 서버 정보 */}
+        <div className="card">
+          <div className="card-header">
+            <h3 className="card-title flex items-center gap-2">
+              <FiServer /> 운영 서버
+            </h3>
+          </div>
+          <div className="p-4 space-y-2">
+            <p className="text-sm font-semibold text-gray-800">컴퓨터: server</p>
+            <p className="text-xs text-gray-500 mb-2">Windows 노트북</p>
+            <p className="text-sm text-gray-600">호스트: 183.102.56.171</p>
+            <p className="text-sm text-gray-600">도메인: db.88toy.co.kr</p>
+            <p className="text-sm text-gray-600">저장소: 88ERP_server</p>
+            <div className="flex items-center gap-2 mt-2">
+              <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+              <span className="text-sm text-green-600">정상 작동중</span>
             </div>
           </div>
+        </div>
 
-          {/* 운영 서버 컨테이너 목록 */}
-          <div className="card">
-            <div className="card-header">
-              <h4 className="text-sm font-medium flex items-center gap-2">
-                <SiDocker /> Docker 컨테이너
-              </h4>
+        {/* 서비스 접속 정보 */}
+        <div className="card">
+          <div className="card-header">
+            <h3 className="card-title flex items-center gap-2">
+              <FiGlobe /> 서비스 접속
+            </h3>
+          </div>
+          <div className="p-4 space-y-2">
+            <div>
+              <p className="text-xs text-gray-500 mb-1">웹 대시보드</p>
+              <a href="http://db.88toy.co.kr" target="_blank" rel="noopener noreferrer" 
+                className="text-sm text-blue-600 hover:underline">
+                db.88toy.co.kr
+              </a>
             </div>
-            <div className="p-4">
-              <div className="space-y-2">
-                {prodContainers.map((container) => (
-                  <div key={container.name} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2">
-                      {container.icon}
-                      <span className="font-mono">{container.name}</span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <span className="text-gray-500">:{container.ports}</span>
-                      <span className={`text-xs px-2 py-1 rounded ${
-                        container.status === 'running' 
-                          ? 'bg-green-100 text-green-700' 
-                          : 'bg-yellow-100 text-yellow-700'
-                      }`}>
-                        {container.status}
-                      </span>
-                    </div>
+            <div>
+              <p className="text-xs text-gray-500 mb-1">n8n 자동화</p>
+              <a href="http://183.102.56.171:5678/home/" target="_blank" rel="noopener noreferrer"
+                className="text-sm text-blue-600 hover:underline">
+                183.102.56.171:5678/home
+              </a>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 mb-1">개발 서버</p>
+              <a href="http://localhost:3000" target="_blank" rel="noopener noreferrer"
+                className="text-sm text-blue-600 hover:underline">
+                localhost:3000
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 컨테이너 정보 - 2열 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* 개발 서버 컨테이너 */}
+        <div className="card">
+          <div className="card-header">
+            <h4 className="text-sm font-medium flex items-center gap-2">
+              <SiDocker /> 개발 서버 Docker 컨테이너
+            </h4>
+          </div>
+          <div className="p-4">
+            <div className="space-y-2">
+              {devContainers.map((container) => (
+                <div key={container.name} className="flex items-center justify-between text-sm py-1">
+                  <div className="flex items-center gap-2">
+                    {container.icon}
+                    <span className="font-mono text-xs">{container.name}</span>
                   </div>
-                ))}
-              </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-gray-500 text-xs">:{container.ports}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded ${
+                      container.status === 'running' 
+                        ? 'bg-green-100 text-green-700' 
+                        : 'bg-yellow-100 text-yellow-700'
+                    }`}>
+                      {container.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* 운영 서버 컨테이너 */}
+        <div className="card">
+          <div className="card-header">
+            <h4 className="text-sm font-medium flex items-center gap-2">
+              <SiDocker /> 운영 서버 Docker 컨테이너
+            </h4>
+          </div>
+          <div className="p-4">
+            <div className="space-y-2">
+              {prodContainers.map((container) => (
+                <div key={container.name} className="flex items-center justify-between text-sm py-1">
+                  <div className="flex items-center gap-2">
+                    {container.icon}
+                    <span className="font-mono text-xs">{container.name}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-gray-500 text-xs">:{container.ports}</span>
+                    <span className={`text-xs px-2 py-0.5 rounded ${
+                      container.status === 'running' 
+                        ? 'bg-green-100 text-green-700' 
+                        : 'bg-yellow-100 text-yellow-700'
+                    }`}>
+                      {container.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
