@@ -1,0 +1,128 @@
+# 88ERP Docker 컨테이너 정보
+날짜: 2025-07-14 12:21
+
+## 프로젝트 개요
+- 프로젝트명: 88ERP (Enterprise Resource Planning System)
+- 위치: /home/sp1/88ERP
+- GitHub: https://github.com/kimsooim/88ERP_WSL
+- 목적: 데이터 일원화 + 업무 자동화 + 외부접속 가능한 리눅스 기반 웹대시보드
+
+## Docker 컨테이너 구성
+
+### 1. 88erp_web_dashboard
+- **용도**: Next.js 기반 웹 대시보드
+- **이미지**: 88erp-web-dashboard
+- **포트**: 3000
+- **접속**: http://localhost:3000
+- **상태**: 정상 실행중
+- **기능**: 
+  - 로그인/권한 시스템
+  - 데이터 시각화
+  - CRUD 화면 구성
+  - 외부접속용 웹 인터페이스
+
+### 2. 88erp_db
+- **용도**: PostgreSQL 데이터베이스
+- **이미지**: postgres:15-alpine
+- **포트**: 5433 (호스트) → 5432 (컨테이너)
+- **접속**: localhost:5433
+- **상태**: 정상 실행중
+- **데이터**: 88erp_postgres_data 볼륨
+- **인증정보**:
+  - User: postgres
+  - Password: postgres
+  - Database: 88erp
+
+### 3. 88erp_redis
+- **용도**: Redis 캐시 서버
+- **이미지**: redis:7-alpine
+- **포트**: 6379
+- **접속**: localhost:6379
+- **상태**: 정상 실행중
+- **데이터**: 88erp_redis_data 볼륨
+
+### 4. 88erp_monitor
+- **용도**: PM2 기반 서버 모니터링
+- **이미지**: 88erp-monitor
+- **포트**: 3002 (호스트) → 3001 (컨테이너)
+- **접속**: http://localhost:3002
+- **상태**: 재시작 반복중 (설정 파일 필요)
+- **문제**: ecosystem.monitor.config.js 파일 없음
+
+## 네트워크
+- **이름**: 88erp_network
+- **타입**: bridge
+- **용도**: 모든 컨테이너간 내부 통신
+
+## 볼륨
+1. **88erp_postgres_data**: PostgreSQL 데이터 저장
+2. **88erp_redis_data**: Redis 데이터 저장
+
+## Docker 명령어 모음
+
+### 기본 명령어
+```bash
+# 전체 실행
+docker-compose up -d
+
+# 전체 중지
+docker-compose down
+
+# 로그 확인
+docker-compose logs -f
+
+# 상태 확인
+docker-compose ps
+```
+
+### 개별 컨테이너 관리
+```bash
+# 웹 대시보드 재시작
+docker-compose restart web-dashboard
+
+# DB 접속
+docker exec -it 88erp_db psql -U postgres -d 88erp
+
+# Redis 접속
+docker exec -it 88erp_redis redis-cli
+
+# 컨테이너 로그
+docker logs 88erp_web_dashboard -f
+```
+
+### 문제 해결
+```bash
+# 컨테이너 강제 재생성
+docker-compose up -d --force-recreate
+
+# 이미지 재빌드
+docker-compose build --no-cache
+
+# 볼륨 포함 완전 삭제 (주의!)
+docker-compose down -v
+```
+
+## 환경 설정
+- 개발 환경: Docker Desktop on WSL2
+- Node.js: 18-alpine
+- Next.js: 14.0.4
+- PostgreSQL: 15-alpine
+- Redis: 7-alpine
+
+## 포트 할당 정리
+- 3000: 88ERP 웹 대시보드
+- 3002: 88ERP 모니터링
+- 5433: 88ERP PostgreSQL
+- 6379: Redis (88ERP 전용)
+
+## 운영 서버 정보
+- IP: 192.168.32.128
+- OS: Rocky Linux VM
+- 사용자: root
+- 참고: 현재는 로컬 개발 환경, 운영은 별도 배포 필요
+
+## 다음 작업
+1. ecosystem.monitor.config.js 파일 생성
+2. .env 파일 설정 (NEXTAUTH_SECRET 등)
+3. 데이터베이스 마이그레이션
+4. 운영 서버 배포 가이드 작성
