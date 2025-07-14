@@ -1,0 +1,73 @@
+# NEW_88TOY 프로젝트 GitHub 설정 및 기획서 작성
+작성일: 2025-01-14 16:45
+작성자: Ann (Cottonfood)
+담당: Claude Code
+
+## 완료한 작업
+
+### 1. 프로젝트 기획서 작성
+- `/home/sp1/new_88toy/memory/project_info.md` - 기본 프로젝트 정보
+- `/home/sp1/new_88toy/memory/NEW_88TOY_프로젝트.md` - 상세 기획서 작성
+  - 프로젝트 배경 및 목표
+  - 기술 스택 상세
+  - 5가지 핵심 기능 (포트폴리오, 견적, AI챗봇, 샘플신청, 관리자)
+  - 화면 구성안
+  - 데이터베이스 설계
+  - 디렉토리 구조
+  - 6단계 개발 로드맵
+  - KPI 지표
+  - 리스크 관리
+  - 향후 확장 계획
+
+### 2. GitHub 저장소 생성 및 연결
+- 저장소 URL: https://github.com/kimsooim/new_88toy
+- Git 초기화 및 첫 커밋 완료
+- .gitignore 파일 생성
+- README.md 작성 및 수정
+
+### 3. 프로젝트 정의 명확화
+- 88TOY는 OEM 전문 사업 (브랜드와 별개)
+- B2B 플랫폼으로 포지셔닝
+- 타겟: 캐릭터 IP 보유 기업, 브랜드 굿즈 제작사, 이벤트 기획사 등
+
+## 기술 스택 결정
+- Frontend: Next.js 14 (App Router), TypeScript, Tailwind CSS
+- UI: shadcn/ui
+- Backend: Supabase (PostgreSQL)
+- AI: Claude API / OpenAI GPT
+- Deployment: Vercel
+- State: Zustand
+- Forms: React Hook Form + Zod
+
+## 주요 기능
+1. 포트폴리오 갤러리 (OEM 제작 사례)
+2. 실시간 견적 계산기
+3. AI 상담 챗봇 (24시간 견적 상담)
+4. 샘플 신청 시스템
+5. B2B 관리자 대시보드
+
+## 개발 로드맵
+- Phase 1: 기초 설정 (1주차)
+- Phase 2: 핵심 기능 개발 (2-4주차)
+- Phase 3: AI 통합 (5주차)
+- Phase 4: 관리자 기능 (6주차)
+- Phase 5: 최적화 및 테스트 (7-8주차)
+- Phase 6: 배포 및 안정화 (9-10주차)
+
+## 목표 지표
+- 월간 견적 문의: 50건 이상
+- 견적 전환율: 30% 이상
+- 페이지 로딩: 3초 이내
+- 모바일 성능: 90점 이상
+
+## 다음 단계
+1. Next.js 프로젝트 초기화 및 기본 구조 세팅
+2. Supabase 프로젝트 생성 및 DB 테이블 설계
+3. 프로젝트 폴더 구조 생성
+4. 개발 환경 설정 (ESLint, Prettier 등)
+
+## 메모
+- 프로젝트 시작일: 2025-01-14
+- MVP 목표: 6주
+- 정식 런칭: 10주
+- 도메인 예정: new.88toy.co.kr
