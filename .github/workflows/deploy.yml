@@ -1,0 +1,65 @@
+name: Deploy to Production Server
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  sync-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    # 운영 서버 저장소로 코드 동기화
+    - name: Sync to Production Repository
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Git 설정
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        
+        # 운영 서버 저장소 클론
+        git clone https://${GITHUB_TOKEN}@github.com/kimsooim/88ERP_server.git prod_repo
+        cd prod_repo
+        
+        # 기존 파일 정리 (git 제외)
+        find . -mindepth 1 -maxdepth 1 ! -name '.git' ! -name '.gitignore' -exec rm -rf {} +
+        
+        # 필요한 파일 복사
+        cp -r ../projects/web-dashboard ./projects/
+        cp ../docker-compose.prod.yml ./docker-compose.yml
+        cp ../Dockerfile.prod ./Dockerfile
+        cp ../.dockerignore ./
+        cp ../.env.example ./
+        
+        # 커밋 및 푸시
+        git add -A
+        git commit -m "🚀 Auto deploy from development - ${{ github.sha }}" || true
+        git push origin main
+    
+    # 운영 서버에 배포
+    - name: Deploy to Production Server
+      uses: appleboy/ssh-action@v0.1.5
+      with:
+        host: ${{ secrets.PROD_HOST }}
+        username: ${{ secrets.PROD_USER }}
+        key: ${{ secrets.PROD_SSH_KEY }}
+        port: 22
+        script: |
+          cd /root/88ERP
+          
+          # 최신 코드 가져오기 (88ERP_server 저장소에서)
+          git pull origin main
+          
+          # Docker 재시작
+          docker-compose down
+          docker-compose up -d --build
+          
+          # 헬스체크
+          sleep 15
+          curl -f http://localhost:3000 || exit 1
+          
+          echo "✅ Deployment completed successfully!"

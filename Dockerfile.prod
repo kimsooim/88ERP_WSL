@@ -1,0 +1,47 @@
+# 88ERP 운영용 Dockerfile (멀티스테이지 빌드)
+
+# 1단계: 빌드 환경
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# 의존성 파일 복사
+COPY projects/web-dashboard/package.json projects/web-dashboard/package-lock.json* ./
+
+# 의존성 설치
+RUN npm ci --only=production
+
+# 개발 의존성 설치 (빌드용)
+RUN npm ci
+
+# 소스 코드 복사
+COPY projects/web-dashboard/ ./
+
+# Next.js 빌드
+RUN npm run build
+
+# 2단계: 운영 환경
+FROM node:18-alpine AS runner
+
+WORKDIR /app
+
+# 운영에 필요한 파일만 복사
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+
+# 비루트 사용자 생성
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nextjs -u 1001
+
+# 소유권 변경
+RUN chown -R nextjs:nodejs /app
+
+USER nextjs
+
+# 포트 설정
+EXPOSE 3000
+
+# 운영 서버 실행
+CMD ["npm", "start"]
