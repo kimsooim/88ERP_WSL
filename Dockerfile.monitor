@@ -1,0 +1,23 @@
+# 88ERP 모니터링 서버용 Dockerfile
+FROM node:18-alpine
+
+# PM2 설치
+RUN npm install -g pm2
+
+# 작업 디렉토리 설정
+WORKDIR /app
+
+# 의존성 파일 복사
+COPY projects/server-monitor/package.json projects/server-monitor/package-lock.json* ./
+
+# 의존성 설치
+RUN npm install
+
+# 소스 코드 복사
+COPY projects/server-monitor/ ./
+
+# 포트 설정
+EXPOSE 3001
+
+# PM2로 서버 실행
+CMD ["pm2-runtime", "start", "ecosystem.monitor.config.js"]

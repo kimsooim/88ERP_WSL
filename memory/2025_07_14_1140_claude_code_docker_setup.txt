@@ -1,0 +1,96 @@
+# 88ERP Docker 개발 환경 구축
+날짜: 2025-07-14 11:40
+
+## 개요
+88ERP 프로젝트를 Docker 환경에서 개발할 수 있도록 설정했습니다.
+운영 서버는 별도 컴퓨터(192.168.32.128 Rocky Linux VM)에 있으며, 이는 로컬 개발 환경입니다.
+
+## Docker 구성
+
+### 1. 생성된 파일들
+- `/home/sp1/88ERP/Dockerfile.dev` - 웹 대시보드용 Dockerfile
+- `/home/sp1/88ERP/Dockerfile.monitor` - 모니터링 서버용 Dockerfile  
+- `/home/sp1/88ERP/docker-compose.yml` - Docker Compose 설정
+- `/home/sp1/88ERP/.dockerignore` - Docker 빌드 제외 파일
+- `/home/sp1/88ERP/.env.example` - 환경 변수 예시
+- `/home/sp1/88ERP/README.Docker.md` - Docker 사용 가이드
+
+### 2. 서비스 구성
+1. **web-dashboard** (88erp_web_dashboard)
+   - Next.js 웹 대시보드
+   - 포트: 3000
+   - Node.js 18 Alpine 기반
+   
+2. **db** (88erp_db)
+   - PostgreSQL 15 Alpine
+   - 포트: 5433 (new_88toy가 5432 사용중)
+   - 데이터: 88erp_postgres_data 볼륨
+   
+3. **redis** (88erp_redis)
+   - Redis 7 Alpine
+   - 포트: 6379
+   - 데이터: 88erp_redis_data 볼륨
+   
+4. **monitor** (88erp_monitor)
+   - PM2 모니터링 서버
+   - 포트: 3002 (new_88toy가 3001 사용중)
+   - Node.js 18 Alpine + PM2
+
+### 3. 포트 할당
+- 3000: 88ERP 웹 대시보드
+- 3001: new_88toy (사용중)
+- 3002: 88ERP 모니터링
+- 5432: new_88toy PostgreSQL (사용중)
+- 5433: 88ERP PostgreSQL
+- 6379: Redis
+
+### 4. 네트워크
+- 88erp_network: 모든 서비스가 연결된 브리지 네트워크
+
+## 실행 방법
+
+### 빠른 시작
+```bash
+# 환경 변수 설정
+cp .env.example .env
+
+# 모든 서비스 실행
+docker-compose up -d
+
+# 로그 확인
+docker-compose logs -f web-dashboard
+```
+
+### 접속 URL
+- 웹 대시보드: http://localhost:3000
+- 모니터링: http://localhost:3002 (monitor 서비스 정상화 필요)
+
+## 현재 상태
+- ✅ Docker 파일 생성 완료
+- ✅ docker-compose.yml 설정 완료
+- ✅ 포트 충돌 해결 (3001→3002, 5432→5433)
+- ✅ 웹 대시보드 정상 실행중
+- ⚠️ 모니터링 서버는 ecosystem.monitor.config.js 파일 필요
+
+## 주의사항
+1. 개발 환경용 설정이므로 프로덕션에서는 별도 설정 필요
+2. .env 파일은 Git에 커밋하지 않기
+3. 데이터는 Docker 볼륨에 저장되므로 주기적 백업 필요
+4. 운영 서버는 192.168.32.128에 별도로 존재
+
+## 문제 해결
+
+### 포트 충돌
+- new_88toy 프로젝트와 포트가 겹치지 않도록 조정
+- 88ERP: 3000, 3002, 5433, 6379
+- new_88toy: 3001, 5432
+
+### 모니터링 서버 오류
+- ecosystem.monitor.config.js 파일이 없어서 재시작 반복중
+- PM2 설정 파일 생성 필요
+
+## 다음 작업
+1. 모니터링 서버 설정 파일 생성
+2. .env 파일 생성 및 환경 변수 설정
+3. 데이터베이스 초기화 스크립트 작성
+4. 프로덕션 배포 가이드 작성

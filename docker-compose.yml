@@ -1,0 +1,75 @@
+services:
+  # 88ERP 웹 대시보드
+  web-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: 88erp_web_dashboard
+    ports:
+      - "3000:3000"  # 웹 대시보드
+    volumes:
+      - ./projects/web-dashboard:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/88erp
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=your-secret-key-here
+    depends_on:
+      - db
+    networks:
+      - 88erp_network
+    restart: unless-stopped
+
+  # PostgreSQL 데이터베이스
+  db:
+    image: postgres:15-alpine
+    container_name: 88erp_db
+    ports:
+      - "5433:5432"  # 호스트 5433 -> 컨테이너 5432 (new_88toy가 5432 사용중)
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=88erp
+    volumes:
+      - 88erp_postgres_data:/var/lib/postgresql/data
+    networks:
+      - 88erp_network
+    restart: unless-stopped
+
+  # Redis 캐시 서버 (선택사항)
+  redis:
+    image: redis:7-alpine
+    container_name: 88erp_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - 88erp_redis_data:/data
+    networks:
+      - 88erp_network
+    restart: unless-stopped
+
+  # 서버 모니터링 (PM2)
+  monitor:
+    build:
+      context: .
+      dockerfile: Dockerfile.monitor
+    container_name: 88erp_monitor
+    ports:
+      - "3002:3001"  # 모니터링 대시보드 (new_88toy가 3001 사용중)
+    volumes:
+      - ./projects/server-monitor:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=production
+    networks:
+      - 88erp_network
+    restart: unless-stopped
+
+volumes:
+  88erp_postgres_data:
+  88erp_redis_data:
+
+networks:
+  88erp_network:
+    driver: bridge
