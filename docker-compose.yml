@@ -6,10 +6,13 @@ services:
       dockerfile: Dockerfile.dev
     container_name: 88erp_web_dashboard
     ports:
-      - "3000:3000"  # 웹 대시보드
+      - "3010:3000"  # 웹 대시보드 (포트 변경 테스트)
     volumes:
       - ./projects/web-dashboard:/app
       - /app/node_modules
+      - /home/sp1/.ssh:/root/.ssh
+      - ./scripts:/scripts:ro
+      - .:/home/sp1/88ERP:ro
     environment:
       - NODE_ENV=development
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/88erp

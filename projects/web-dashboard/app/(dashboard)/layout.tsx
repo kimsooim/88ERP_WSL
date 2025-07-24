@@ -46,11 +46,14 @@ const menuItems: { [key: string]: MenuItem[] } = {
     { name: '자동화', href: '/toy/automation', icon: <FiSettings className="w-4 h-4" /> }
   ],
   'purchase-report': [
-    { name: '전체재고', href: '/purchase-report/total-inventory', icon: <FiPackage className="w-4 h-4" /> },
-    { name: '기간별재고', href: '/purchase-report/period-inventory', icon: <FiCalendar className="w-4 h-4" /> },
-    { name: '사업부별재고', href: '/purchase-report/business-inventory', icon: <FiBriefcase className="w-4 h-4" /> },
-    { name: '품목별재고', href: '/purchase-report/item-inventory', icon: <FiClipboard className="w-4 h-4" /> },
-    { name: '수입현황', href: '/purchase-report/import-status', icon: <FiTruck className="w-4 h-4" /> }
+    { name: '기초관리', href: '/purchase-report/basic-management', icon: <FiSettings className="w-4 h-4" /> },
+    { name: '품목관리', href: '/purchase-report/item-management', icon: <FiPackage className="w-4 h-4" /> },
+    { name: '입고관리', href: '/purchase-report/incoming', icon: <FiTruck className="w-4 h-4" /> },
+    { name: '출고관리', href: '/purchase-report/outgoing', icon: <FiPackage className="w-4 h-4" /> },
+    { name: '도매재고', href: '/purchase-report/wholesale', icon: <FiBriefcase className="w-4 h-4" /> },
+    { name: '오프라인재고', href: '/purchase-report/offline', icon: <FiShoppingCart className="w-4 h-4" /> },
+    { name: '온라인재고', href: '/purchase-report/online', icon: <FiActivity className="w-4 h-4" /> },
+    { name: '자재재고', href: '/purchase-report/materials', icon: <FiClipboard className="w-4 h-4" /> }
   ],
   'sales-report': [
     { name: '기간별분석', href: '/sales-report/period-analysis', icon: <FiCalendar className="w-4 h-4" /> },
@@ -77,7 +80,8 @@ const menuItems: { [key: string]: MenuItem[] } = {
     { name: '사용자관리', href: '/admin/users', icon: <FiUsers className="w-4 h-4" /> },
     { name: '로그인설정', href: '/admin/pages', icon: <FiFileText className="w-4 h-4" /> },
     { name: '로그관리', href: '/admin/logs', icon: <FiActivity className="w-4 h-4" /> },
-    { name: '서버관리', href: '/admin/servers', icon: <FiTrendingUp className="w-4 h-4" /> }
+    { name: '서버관리', href: '/admin/servers', icon: <FiTrendingUp className="w-4 h-4" /> },
+    { name: '개발로그', href: '/admin/devlog', icon: <FiFileText className="w-4 h-4" /> }
   ]
 };
 
@@ -133,7 +137,7 @@ export default function DashboardLayout({
       online: '온라인사업',
       offline: '오프라인사업',
       toy: '토이사업',
-      'purchase-report': '구매보고서',
+      'purchase-report': '재고관리',
       'sales-report': '매출보고서',
       'profit-report': '손익보고서',
       mypage: '마이페이지',

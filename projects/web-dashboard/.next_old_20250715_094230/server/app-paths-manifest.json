@@ -1,0 +1,12 @@
+{
+  "/(dashboard)/admin/servers/page": "app/(dashboard)/admin/servers/page.js",
+  "/(dashboard)/offline/automation/page": "app/(dashboard)/offline/automation/page.js",
+  "/(dashboard)/admin/devlog/page": "app/(dashboard)/admin/devlog/page.js",
+  "/(dashboard)/admin/logs/page": "app/(dashboard)/admin/logs/page.js",
+  "/(dashboard)/online/page": "app/(dashboard)/online/page.js",
+  "/(dashboard)/offline/page": "app/(dashboard)/offline/page.js",
+  "/(dashboard)/toy/page": "app/(dashboard)/toy/page.js",
+  "/(dashboard)/purchase-report/total-inventory/page": "app/(dashboard)/purchase-report/total-inventory/page.js",
+  "/(dashboard)/sales-report/period-analysis/page": "app/(dashboard)/sales-report/period-analysis/page.js",
+  "/(dashboard)/profit-report/cost-management/page": "app/(dashboard)/profit-report/cost-management/page.js"
+}

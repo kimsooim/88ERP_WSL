@@ -3,7 +3,7 @@ import './globals.css'
 import { Providers } from './providers'
 
 export const metadata: Metadata = {
-  title: '88ERP - Enterprise Resource Planning System',
+  title: '88ERP',
   description: '88TOY 통합 업무 관리 시스템',
 }
 

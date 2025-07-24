@@ -1,6 +1,9 @@
 # 88ERP 개발용 Dockerfile
 FROM node:18-alpine
 
+# bash와 필요한 도구들 설치
+RUN apk add --no-cache bash openssh-client curl git
+
 # 작업 디렉토리 설정
 WORKDIR /app
 

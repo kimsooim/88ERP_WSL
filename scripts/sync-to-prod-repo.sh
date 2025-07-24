@@ -17,7 +17,15 @@ mkdir -p $TEMP_DIR
 
 echo "📥 운영 서버 저장소 클론중..."
 cd $TEMP_DIR
-git clone https://github.com/kimsooim/88ERP_server.git 88ERP_server
+
+# GitHub Personal Access Token을 환경변수로 사용
+if [ -z "$GITHUB_TOKEN" ]; then
+    echo "❌ GITHUB_TOKEN 환경변수가 설정되지 않았습니다."
+    echo "임시로 SSH 방식을 시도합니다..."
+    git clone git@github.com:kimsooim/88ERP_server.git 88ERP_server
+else
+    git clone https://$GITHUB_TOKEN@github.com/kimsooim/88ERP_server.git 88ERP_server
+fi
 cd 88ERP_server
 
 # 기존 파일 삭제 (git 관련 제외)
